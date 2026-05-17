@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Header = ({ onStart, onHome, onSignIn, showNav = false }) => {
+const Header = ({ onStart, onHome, onSignIn, onOrganizations, onReports, onUpgrade, onReviewer, onProfile, showNav = false }) => {
   return (
     <header className="w-full bg-[#050816] border-b border-white/5 py-4">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
@@ -20,13 +20,16 @@ const Header = ({ onStart, onHome, onSignIn, showNav = false }) => {
         <div className="flex items-center space-x-8">
           {showNav && (
             <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-400">
-              <a href="#" onClick={onHome} className="hover:text-white transition">Home</a>
-              <a href="#" className="hover:text-white transition">Simulator</a>
-              <a href="#" className="hover:text-white transition">Reports</a>
+              <button type="button" onClick={onHome} className="hover:text-white transition">Home</button>
+              <button type="button" onClick={onOrganizations} className="hover:text-white transition">Organizations</button>
+              <button type="button" onClick={onReports} className="hover:text-white transition">Reports</button>
+              <button type="button" onClick={onProfile} className="hover:text-white transition">Profile</button>
+              <button type="button" onClick={onUpgrade} className="hover:text-white transition">Upgrade</button>
+              <button type="button" onClick={onReviewer} className="hover:text-white transition">Reviewer</button>
             </nav>
           )}
           
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-4">
             <button 
               onClick={onSignIn}
               className="text-slate-400 hover:text-white text-sm font-semibold transition"

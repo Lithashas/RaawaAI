@@ -7,6 +7,14 @@ import SimulationForm from './components/SimulationForm';
 import Dashboard from './components/Dashboard';
 import RefinementPanel from './components/RefinementPanel';
 import ReportViewer from './components/ReportViewer';
+import Organizations from './components/Organizations';
+import Reports from './components/Reports';
+import StrategicReport from './components/StrategicReport';
+import OptimizationReport from './components/OptimizationReport';
+import Upgrade from './components/Upgrade';
+import ReviewerDashboard from './components/ReviewerDashboard';
+import Profile from './components/Profile';
+import NewOrganization from './components/NewOrganization';
 import Footer from './components/Footer';
 import { runSimulation, refinePolicy, generateReport } from './services/geminiService';
 
@@ -60,19 +68,24 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-[#050816] text-slate-100 selection:bg-blue-500/30 flex flex-col">
-      {view !== 'login' && view !== 'signup' && (
+      {view !== 'signup' && (
         <Header 
           onHome={() => setView('landing')}
           onSignIn={() => setView('login')}
           onStart={() => setView('simulator')}
-          showNav={view === 'simulator'}
+          onOrganizations={() => setView('organizations')}
+          onReports={() => setView('reports')}
+          onUpgrade={() => setView('upgrade')}
+          onReviewer={() => setView('reviewer')}
+          onProfile={() => setView('profile')}
+          showNav={['landing','simulator','organizations','reports','strategicReport','optimizationReport','upgrade','reviewer','profile'].includes(view)}
         />
       )}
 
       <main className="flex-grow relative">
         {view === 'landing' && (
           <div className="max-w-7xl mx-auto px-6">
-            <Hero onStart={() => setView('simulator')} />
+            <Hero onStart={() => setView('simulator')} onReview={() => setView('reviewer')} />
           </div>
         )}
         
@@ -117,6 +130,61 @@ const App = () => {
                 onClose={() => setRefinement(null)} 
               />
             )}
+          </div>
+        )}
+
+        {view === 'organizations' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <Organizations 
+              onBack={() => setView('simulator')} 
+              onCreateOrg={() => setView('newOrganization')} 
+            />
+          </div>
+        )}
+
+        {view === 'reports' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <Reports 
+              onBack={() => setView('simulator')} 
+              onDetailedReport={() => setView('strategicReport')} 
+              onOptimizeConcept={() => setView('optimizationReport')} 
+            />
+          </div>
+        )}
+
+        {view === 'strategicReport' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <StrategicReport onBack={() => setView('reports')} />
+          </div>
+        )}
+
+        {view === 'optimizationReport' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <OptimizationReport onBack={() => setView('reports')} />
+          </div>
+        )}
+
+        {view === 'newOrganization' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <NewOrganization onBack={() => setView('organizations')} />
+          </div>
+        )}
+
+        {view === 'upgrade' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <Upgrade onBack={() => setView('simulator')} />
+          </div>
+        )}
+
+        {view === 'reviewer' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <ReviewerDashboard onBack={() => setView('simulator')} />
+          </div>
+        )}
+
+        {view === 'profile' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <Profile />
           </div>
         )}
       </main>
