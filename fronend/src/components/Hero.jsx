@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 
-const Hero = ({ onStart }) => {
+const Hero = ({ onStart, onReview }) => {
   const scrollToFooter = () => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   };
