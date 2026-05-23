@@ -3,19 +3,14 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
+import AgencyDashboard from './components/AgencyDashboard';
 import SimulationForm from './components/SimulationForm';
 import Dashboard from './components/Dashboard';
 import RefinementPanel from './components/RefinementPanel';
 import ReportViewer from './components/ReportViewer';
-import Organizations from './components/Organizations';
-import Reports from './components/Reports';
-import StrategicReport from './components/StrategicReport';
-import OptimizationReport from './components/OptimizationReport';
-import Upgrade from './components/Upgrade';
-import ReviewerDashboard from './components/ReviewerDashboard';
-import Profile from './components/Profile';
-import NewOrganization from './components/NewOrganization';
+import Settings from './components/Settings.jsx';
 import Footer from './components/Footer';
+import SavePasswordDialog from './components/SavePasswordDialog';
 import { runSimulation, refinePolicy, generateReport } from './services/geminiService';
 
 const App = () => {
@@ -26,6 +21,10 @@ const App = () => {
   const [report, setReport] = useState(null);
   const [isRefining, setIsRefining] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [showSavePassword, setShowSavePassword] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+  const [lastView, setLastView] = useState('landing');
 
   const handleStartSimulation = async (concept, audience) => {
     setIsLoading(true);
@@ -73,12 +72,12 @@ const App = () => {
           onHome={() => setView('landing')}
           onSignIn={() => setView('login')}
           onStart={() => setView('simulator')}
-          onOrganizations={() => setView('organizations')}
-          onReports={() => setView('reports')}
-          onUpgrade={() => setView('upgrade')}
-          onReviewer={() => setView('reviewer')}
-          onProfile={() => setView('profile')}
-          showNav={['landing','simulator','organizations','reports','strategicReport','optimizationReport','upgrade','reviewer','profile'].includes(view)}
+          onSignOut={() => setView('landing')}
+          onSettings={() => {
+            setLastView(view);
+            setView('settings');
+          }}
+          view={view}
         />
       )}
 
@@ -93,6 +92,12 @@ const App = () => {
           <Login 
             onBack={() => setView('landing')} 
             onSignUp={() => setView('signup')} 
+            onSignInSuccess={(email, password) => {
+              setUserEmail(email);
+              setUserPassword(password);
+              setView('agency-dashboard');
+              setShowSavePassword(true);
+            }}
           />
         )}
 
@@ -100,13 +105,33 @@ const App = () => {
           <SignUp 
             onBack={() => setView('landing')} 
             onSignIn={() => setView('login')} 
+            onSignUpSuccess={(email, password) => {
+              setUserEmail(email);
+              setUserPassword(password);
+              setView('agency-dashboard');
+              setShowSavePassword(true);
+            }}
           />
+        )}
+
+        {view === 'agency-dashboard' && (
+          <AgencyDashboard 
+            onNewSimulation={() => setView('simulator')} 
+            onSettings={() => {
+              setLastView('agency-dashboard');
+              setView('settings');
+            }}
+          />
+        )}
+        
+        {view === 'settings' && (
+          <Settings onBack={() => setView(lastView)} />
         )}
         
         {view === 'simulator' && (
           <div className="max-w-7xl mx-auto px-6 py-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[calc(100vh-80px)]">
             <div className="text-center mb-8">
-              <h1 className="text-5xl font-black mb-4 tracking-tight">RAAWA AI</h1>
+              <h1 className="text-5xl font-black mb-4 tracking-tight bg-gradient-to-r from-[#69D2E9] to-[#3498DB] bg-clip-text text-transparent">RaawaAI</h1>
               <p className="text-slate-500 font-medium text-lg uppercase tracking-widest">
                 Predicting Human Resonance via Multi-Agent Personas
               </p>
@@ -195,6 +220,16 @@ const App = () => {
         <ReportViewer 
           report={report} 
           onClose={() => setReport(null)} 
+        />
+      )}
+
+      {showSavePassword && (
+        <SavePasswordDialog 
+          email={userEmail}
+          password={userPassword}
+          onSave={() => setShowSavePassword(false)}
+          onNever={() => setShowSavePassword(false)}
+          onDismiss={() => setShowSavePassword(false)}
         />
       )}
 

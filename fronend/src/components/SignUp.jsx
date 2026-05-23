@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
 import { User, Mail, Building2, Briefcase, Lock, Eye, EyeOff, X, ShieldCheck, ChevronDown } from 'lucide-react';
 
-const SignUp = ({ onBack, onSignIn }) => {
+const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const scrollToContent = () => {
+    window.scrollBy({ top: 300, behavior: 'smooth' });
+  };
+
+  const handleSignUp = (e) => {
+    e.preventDefault();
+    onSignUpSuccess(email, password);
+  };
 
   return (
     <div className="w-full text-slate-100 flex flex-col font-sans">
@@ -37,6 +48,15 @@ const SignUp = ({ onBack, onSignIn }) => {
           aria-label="Close"
         >
           <X size={32} />
+        </button>
+
+        {/* Scroll Hint */}
+        <button
+          onClick={scrollToContent}
+          className="fixed bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center text-slate-500 hover:text-[#49C5E0] transition-colors group z-20 animate-bounce"
+        >
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2 opacity-50 group-hover:opacity-100 transition-opacity whitespace-nowrap">Scroll for form</span>
+          <ChevronDown size={24} />
         </button>
 
         <div className="w-full max-w-xl bg-white/5 border border-white/10 rounded-3xl p-8 md:p-10 backdrop-blur-xl relative overflow-hidden mt-8">
@@ -75,6 +95,8 @@ const SignUp = ({ onBack, onSignIn }) => {
                   <input 
                     type="email" 
                     placeholder="you@example.com" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-[#0a0f1d] border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#69D2E9]/50 focus:border-[#69D2E9]/50 transition-all placeholder:text-slate-700"
                   />
                 </div>
@@ -113,6 +135,8 @@ const SignUp = ({ onBack, onSignIn }) => {
                   <input 
                     type={showPassword ? 'text' : 'password'} 
                     placeholder="Create a strong password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full bg-[#0a0f1d] border border-white/10 rounded-xl py-3.5 pl-12 pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-[#69D2E9]/50 focus:border-[#69D2E9]/50 transition-all placeholder:text-slate-700"
                   />
                   <button 
@@ -152,8 +176,12 @@ const SignUp = ({ onBack, onSignIn }) => {
               </p>
             </div>
 
-            <button className="w-full bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-600 hover:to-blue-800 text-white font-semibold py-3.5 rounded-lg shadow-lg shadow-blue-900/20 transition-all active:scale-[0.98]">
-            Create Agent Account 
+            <button 
+              type="button"
+              onClick={handleSignUp}
+              className="w-full bg-gradient-to-r from-[#1061CC] to-[#49C5E0] hover:scale-[1.01] active:scale-[0.99] text-white font-bold py-4 rounded-xl shadow-lg transition-all"
+            >
+              Create Account
             </button>
 
             <div className="text-center mt-6">

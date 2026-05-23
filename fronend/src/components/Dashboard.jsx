@@ -1,4 +1,5 @@
 import React from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 
 const Dashboard = ({ result, onRefine, onGenerateReport, isRefining, isGeneratingReport }) => {
   const backlashData = [
@@ -18,19 +19,31 @@ const Dashboard = ({ result, onRefine, onGenerateReport, isRefining, isGeneratin
         {/* Main Stats */}
         <div className="bg-white/[0.03] p-8 rounded-[2rem] border border-white/5 shadow-2xl backdrop-blur-md">
           <h3 className="text-slate-500 text-[10px] font-black uppercase mb-6 tracking-[0.3em]">Neural Backlash Prob.</h3>
-          <div className="h-48 relative flex items-center justify-center">
-            <div className="relative w-40 h-40 rounded-full bg-white/5 border border-white/10 overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className={`text-4xl font-black ${result.backlashProbability > 60 ? 'text-red-500' : 'text-slate-100'}`}>
-                  {result.backlashProbability}%
-                </span>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 h-4 bg-white/10">
-                <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-400"
-                  style={{ width: `${result.backlashProbability}%` }}
-                />
-              </div>
+          <div className="h-48 relative">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={backlashData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={75}
+                  paddingAngle={8}
+                  dataKey="value"
+                  startAngle={220}
+                  endAngle={-40}
+                  stroke="none"
+                >
+                  {backlashData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className={`text-4xl font-black ${result.backlashProbability > 60 ? 'text-red-500' : 'text-slate-100'}`}>
+                {result.backlashProbability}%
+              </span>
             </div>
           </div>
           <p className="text-center text-[10px] font-black tracking-[0.2em] text-slate-400 mt-2 uppercase">
@@ -41,14 +54,19 @@ const Dashboard = ({ result, onRefine, onGenerateReport, isRefining, isGeneratin
 
         <div className="bg-white/[0.03] p-8 rounded-[2rem] border border-white/5 shadow-2xl backdrop-blur-md">
           <h3 className="text-slate-500 text-[10px] font-black uppercase mb-6 tracking-[0.3em]">Sentiment Alignment</h3>
-          <div className="h-48 flex flex-col items-center justify-center gap-6">
-            <div className="w-full bg-white/5 rounded-full overflow-hidden h-6">
-              <div
-                className={`h-full ${result.sentimentScore < 0 ? 'bg-red-500' : 'bg-emerald-400'}`}
-                style={{ width: `${Math.min(100, Math.max(0, result.sentimentScore + 50))}%` }}
-              />
-            </div>
-            <div className="text-center">
+          <div className="h-48 flex flex-col items-center justify-center">
+            <ResponsiveContainer width="100%" height="40%">
+              <BarChart data={sentimentData} layout="vertical">
+                <XAxis type="number" domain={[-100, 100]} hide />
+                <YAxis type="category" dataKey="name" hide />
+                <Bar 
+                  dataKey="score" 
+                  fill={result.sentimentScore < 0 ? '#ef4444' : '#10b981'} 
+                  radius={[0, 8, 8, 0]} 
+                />
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="text-center mt-6">
               <span className={`text-5xl font-black ${result.sentimentScore < 0 ? 'text-red-500' : 'text-emerald-400'}`}>
                 {result.sentimentScore > 0 ? '+' : ''}{result.sentimentScore}
               </span>

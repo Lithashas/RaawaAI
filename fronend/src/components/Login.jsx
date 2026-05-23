@@ -1,36 +1,74 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
-const Login = ({ onSignUp }) => {
+const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const scrollToContent = () => {
+    window.scrollBy({ top: 300, behavior: 'smooth' });
+  };
+
+  const handleSignIn = (e) => {
+    e.preventDefault();
+    onSignInSuccess(email, password);
+  };
+
   return (
     <div className="w-full text-slate-100 flex flex-col font-sans">
       <main className="flex-grow flex flex-col items-center relative px-6 pt-12 pb-32">
 
-        <div className="w-full max-w-xl bg-white/5 border border-white/10 rounded-3xl p-8 md:p-10 backdrop-blur-xl relative overflow-hidden mt-8">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-transparent via-[#49C5E0]/40 to-transparent"></div>
+        {/* Scroll Hint */}
+        <button
+          onClick={scrollToContent}
+          className="fixed bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center text-slate-500 hover:text-[#49C5E0] transition-colors group z-20 animate-bounce"
+        >
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2 opacity-50 group-hover:opacity-100 transition-opacity">Scroll for form</span>
+          <ChevronDown size={24} />
+        </button>
 
-          <div className="flex flex-col items-center mb-6">
-            <div className="flex items-center space-x-2 px-4 py-1 rounded-full bg-[#69D2E9]/10 border border-[#69D2E9]/20 mb-4 font-medium text-[#69D2E9] text-[9px] uppercase tracking-widest">
-              <span>Returning Agent</span>
+        <div className="w-full max-w-[480px] flex flex-col items-center mt-8">
+          <h1 className="text-3xl font-medium mb-2 tracking-tight">Welcome Back</h1>
+          <p className="text-blue-500 text-sm mb-10 font-medium">Sign in to your account to continue</p>
+
+          <form className="w-full space-y-5" onSubmit={handleSignIn}>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-300">Email</label>
+              <div className="relative group">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                  <Mail className="w-5 h-5" />
+                </span>
+                <input 
+                  type="email" 
+                  placeholder="you@example.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-[#050816] border border-slate-800 rounded-lg py-3 pl-12 pr-4 focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 outline-none transition-all placeholder:text-slate-600"
+                />
+              </div>
             </div>
 
-            <h2 className="text-xl font-bold text-white mb-2">Welcome Back</h2>
-            <p className="text-slate-400 text-xs text-center">Sign in to your account to continue</p>
-          </div>
-
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-            <div className="space-y-4">
-              <div className="group">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#69D2E9] transition-colors" size={18} />
-                  <input 
-                    type="email" 
-                    placeholder="you@example.com" 
-                    className="w-full bg-[#0a0f1d] border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#69D2E9]/50 focus:border-[#69D2E9]/50 transition-all placeholder:text-slate-700"
-                  />
-                </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-300">Password</label>
+              <div className="relative group">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                  <Lock className="w-5 h-5" />
+                </span>
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="Enter your password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-[#050816] border border-slate-800 rounded-lg py-3 pl-12 pr-12 focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 outline-none transition-all placeholder:text-slate-600"
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
 
               <div className="group">
@@ -57,8 +95,14 @@ const Login = ({ onSignUp }) => {
                 <p className="text-[11px] text-slate-400">Remember me</p>
               </div>
 
-              <button className="w-full bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-600 hover:to-blue-800 text-white font-semibold py-3.5 rounded-lg shadow-lg shadow-blue-900/20 transition-all active:scale-[0.98]">
-                Sign In
+            <div className="text-center text-sm pt-2">
+              <span className="text-slate-400">Don't have an account? </span>
+              <button 
+                type="button"
+                onClick={onSignUp}
+                className="text-blue-500 hover:underline font-medium cursor-pointer"
+              >
+                Sign up
               </button>
 
               <div className="text-center mt-2">
