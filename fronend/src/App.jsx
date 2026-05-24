@@ -74,7 +74,7 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-[#050816] text-slate-100 selection:bg-blue-500/30 flex flex-col">
-      {view !== 'login' && view !== 'signup' && (
+      {view !== 'signup' && (
         <Header 
           onHome={() => setView('landing')}
           onSignIn={() => setView('login')}
@@ -91,7 +91,7 @@ const App = () => {
       <main className="flex-grow relative">
         {view === 'landing' && (
           <div className="max-w-7xl mx-auto px-6">
-            <Hero onStart={() => setView('simulator')} />
+            <Hero onStart={() => setView('simulator')} onReview={() => setView('reviewer')} />
           </div>
         )}
         
@@ -162,6 +162,61 @@ const App = () => {
                 onClose={() => setRefinement(null)} 
               />
             )}
+          </div>
+        )}
+
+        {view === 'organizations' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <Organizations 
+              onBack={() => setView('simulator')} 
+              onCreateOrg={() => setView('newOrganization')} 
+            />
+          </div>
+        )}
+
+        {view === 'reports' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <Reports 
+              onBack={() => setView('simulator')} 
+              onDetailedReport={() => setView('strategicReport')} 
+              onOptimizeConcept={() => setView('optimizationReport')} 
+            />
+          </div>
+        )}
+
+        {view === 'strategicReport' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <StrategicReport onBack={() => setView('reports')} />
+          </div>
+        )}
+
+        {view === 'optimizationReport' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <OptimizationReport onBack={() => setView('reports')} />
+          </div>
+        )}
+
+        {view === 'newOrganization' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <NewOrganization onBack={() => setView('organizations')} />
+          </div>
+        )}
+
+        {view === 'upgrade' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <Upgrade onBack={() => setView('simulator')} />
+          </div>
+        )}
+
+        {view === 'reviewer' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <ReviewerDashboard onBack={() => setView('simulator')} />
+          </div>
+        )}
+
+        {view === 'profile' && (
+          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
+            <Profile />
           </div>
         )}
       </main>
