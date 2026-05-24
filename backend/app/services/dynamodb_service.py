@@ -1,0 +1,191 @@
+import os
+from datetime import datetime
+from decimal import Decimal
+
+try:
+    import boto3
+except ImportError:
+    boto3 = None
+
+TABLE_NAME = os.getenv('DYNAMODB_TABLE', 'raawa-simulations')
+_fallback_store = {}
+
+
+def _create_resource():
+    if boto3 is None:
+        return None
+
+    if os.getenv('DYNAMODB_ENDPOINT'):
+        return boto3.resource(
+            'dynamodb',
+            region_name=os.getenv('AWS_REGION', 'us-east-1'),
+            endpoint_url=os.getenv('DYNAMODB_ENDPOINT')
+        )
+
+    return boto3.resource(
+        'dynamodb',
+        region_name=os.getenv('AWS_REGION', 'us-east-1'),
+        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+    )
+
+
+dynamodb_resource = _create_resource()
+
+
+def get_table():
+    """Get DynamoDB table"""
+    if dynamodb_resource is None:
+        return None
+
+    try:
+        table = dynamodb_resource.Table(TABLE_NAME)
+        table.load()
+        return table
+    except Exception as e:
+        print(f"Error accessing DynamoDB table: {e}")
+        # Create table if it doesn't exist
+        try:
+            table = dynamodb_resource.create_table(
+                TableName=TABLE_NAME,
+                KeySchema=[
+                    {'AttributeName': 'simulation_id', 'KeyType': 'HASH'},
+                    {'AttributeName': 'created_at', 'KeyType': 'RANGE'}
+                ],
+                AttributeDefinitions=[
+                    {'AttributeName': 'simulation_id', 'AttributeType': 'S'},
+                    {'AttributeName': 'created_at', 'AttributeType': 'S'}
+                ],
+                BillingMode='PAY_PER_REQUEST'
+            )
+            table.wait_until_exists()
+            return table
+        except Exception as create_error:
+            print(f"Error creating DynamoDB table: {create_error}")
+            raise
+
+
+def save_simulation(simulation_id, concept, audience, backlash_score, sample_posts, metadata=None):
+    """Save simulation result to DynamoDB"""
+    if dynamodb_resource is None:
+        _fallback_store[simulation_id] = {
+            'simulation_id': simulation_id,
+            'created_at': datetime.utcnow().isoformat(),
+            'concept': concept,
+            'audience': audience,
+            'backlash_score': backlash_score,
+            'sample_posts': sample_posts,
+            'metadata': metadata or {}
+        }
+        return _fallback_store[simulation_id]
+
+    try:
+        table = get_table()
+        
+        item = {
+            'simulation_id': simulation_id,
+            'created_at': datetime.utcnow().isoformat(),
+            'concept': concept,
+            'audience': audience,
+            'backlash_score': Decimal(str(backlash_score)),
+            'sample_posts': sample_posts,
+            'metadata': metadata or {}
+        }
+        
+        table.put_item(Item=item)
+        return item
+    except Exception as e:
+        print(f"Error saving simulation: {e}")
+        raise
+
+
+def get_simulation(simulation_id):
+    """Retrieve a simulation by ID"""
+    if dynamodb_resource is None:
+        return _fallback_store.get(simulation_id)
+
+    try:
+        table = get_table()
+        response = table.get_item(Key={'simulation_id': simulation_id})
+        return response.get('Item')
+    except Exception as e:
+        print(f"Error retrieving simulation: {e}")
+        return None
+
+
+def get_all_simulations():
+    """Get all simulations"""
+    if dynamodb_resource is None:
+        return list(_fallback_store.values())
+
+    try:
+        table = get_table()
+        response = table.scan()
+        return response.get('Items', [])
+    except Exception as e:
+        print(f"Error scanning simulations: {e}")
+        return []
+
+
+def save_refinement(simulation_id, refinement_data):
+    """Save refinement data for a simulation"""
+    if dynamodb_resource is None:
+        _fallback_store[f"{simulation_id}-refinement"] = {
+            'simulation_id': f"{simulation_id}-refinement",
+            'created_at': datetime.utcnow().isoformat(),
+            'parent_simulation_id': simulation_id,
+            'policy': refinement_data.get('policy'),
+            'recommendations': refinement_data.get('recommendations'),
+            'metadata': refinement_data.get('metadata', {})
+        }
+        return _fallback_store[f"{simulation_id}-refinement"]
+
+    try:
+        table = get_table()
+        
+        item = {
+            'simulation_id': f"{simulation_id}-refinement",
+            'created_at': datetime.utcnow().isoformat(),
+            'parent_simulation_id': simulation_id,
+            'policy': refinement_data.get('policy'),
+            'recommendations': refinement_data.get('recommendations'),
+            'metadata': refinement_data.get('metadata', {})
+        }
+        
+        table.put_item(Item=item)
+        return item
+    except Exception as e:
+        print(f"Error saving refinement: {e}")
+        raise
+
+
+def save_report(simulation_id, report_data):
+    """Save generated report for a simulation"""
+    if dynamodb_resource is None:
+        _fallback_store[f"{simulation_id}-report"] = {
+            'simulation_id': f"{simulation_id}-report",
+            'created_at': datetime.utcnow().isoformat(),
+            'parent_simulation_id': simulation_id,
+            'title': report_data.get('title'),
+            'content': report_data.get('content'),
+            'metadata': report_data.get('metadata', {})
+        }
+        return _fallback_store[f"{simulation_id}-report"]
+
+    try:
+        table = get_table()
+        
+        item = {
+            'simulation_id': f"{simulation_id}-report",
+            'created_at': datetime.utcnow().isoformat(),
+            'parent_simulation_id': simulation_id,
+            'title': report_data.get('title'),
+            'content': report_data.get('content'),
+            'metadata': report_data.get('metadata', {})
+        }
+        
+        table.put_item(Item=item)
+        return item
+    except Exception as e:
+        print(f"Error saving report: {e}")
+        raise

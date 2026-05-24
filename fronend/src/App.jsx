@@ -11,7 +11,7 @@ import ReportViewer from './components/ReportViewer';
 import Settings from './components/Settings.jsx';
 import Footer from './components/Footer';
 import SavePasswordDialog from './components/SavePasswordDialog';
-import { runSimulation, refinePolicy, generateReport } from './services/geminiService';
+import { runSimulation, refinePolicy, generateReport, saveSimulationId } from './services/geminiService';
 
 const App = () => {
   const [view, setView] = useState('landing');
@@ -29,11 +29,17 @@ const App = () => {
   const handleStartSimulation = async (concept, audience) => {
     setIsLoading(true);
     setRefinement(null);
+    setReport(null);
     try {
       const data = await runSimulation(concept, audience);
       setResult(data);
+      // Save simulation ID for later API calls
+      if (data.simulation_id) {
+        saveSimulationId(data.simulation_id);
+      }
     } catch (error) {
       console.error("Simulation failed:", error);
+      alert('Failed to run simulation. Please ensure the backend is running on port 5000.');
     } finally {
       setIsLoading(false);
     }
@@ -47,6 +53,7 @@ const App = () => {
       setRefinement(data);
     } catch (error) {
       console.error("Refinement failed:", error);
+      alert('Failed to refine policy.');
     } finally {
       setIsRefining(false);
     }
@@ -137,7 +144,7 @@ const App = () => {
               </p>
             </div>
 
-            <SimulationForm onRun={handleStartSimulation} isLoading={isLoading} />
+            <SimulationForm onSubmit={handleStartSimulation} isLoading={isLoading} />
 
             {result && (
               <Dashboard 

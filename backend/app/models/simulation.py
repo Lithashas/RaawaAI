@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import Dict
+from typing import Dict, Union
 
 class SimulationRequest(BaseModel):
     concept: str
-    audience: Dict
+    audience: Union[str, Dict]
