@@ -95,6 +95,8 @@ const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
                 <p className="text-[11px] text-slate-400">Remember me</p>
               </div>
 
+            </div>
+
             <div className="text-center text-sm pt-2">
               <span className="text-slate-400">Don't have an account? </span>
               <button 
