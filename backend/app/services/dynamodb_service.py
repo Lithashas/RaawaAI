@@ -22,11 +22,16 @@ def _create_resource():
             endpoint_url=os.getenv('DYNAMODB_ENDPOINT')
         )
 
+    access_key = os.getenv('AWS_ACCESS_KEY_ID')
+    secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+    if not access_key or not secret_key:
+        return None
+
     return boto3.resource(
         'dynamodb',
         region_name=os.getenv('AWS_REGION', 'us-east-1'),
-        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key
     )
 
 
@@ -106,8 +111,13 @@ def get_simulation(simulation_id):
 
     try:
         table = get_table()
-        response = table.get_item(Key={'simulation_id': simulation_id})
-        return response.get('Item')
+        from boto3.dynamodb.conditions import Attr
+
+        response = table.scan(
+            FilterExpression=Attr('simulation_id').eq(simulation_id)
+        )
+        items = response.get('Items', [])
+        return items[0] if items else None
     except Exception as e:
         print(f"Error retrieving simulation: {e}")
         return None

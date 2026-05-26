@@ -8,6 +8,14 @@ import SimulationForm from './components/SimulationForm';
 import Dashboard from './components/Dashboard';
 import RefinementPanel from './components/RefinementPanel';
 import ReportViewer from './components/ReportViewer';
+import Organizations from './components/Organizations';
+import Reports from './components/Reports';
+import StrategicReport from './components/StrategicReport';
+import OptimizationReport from './components/OptimizationReport';
+import NewOrganization from './components/NewOrganization';
+import Upgrade from './components/Upgrade';
+import ReviewerDashboard from './components/ReviewerDashboard';
+import Profile from './components/Profile';
 import Settings from './components/Settings.jsx';
 import Footer from './components/Footer';
 import SavePasswordDialog from './components/SavePasswordDialog';
@@ -39,7 +47,7 @@ const App = () => {
       }
     } catch (error) {
       console.error("Simulation failed:", error);
-      alert('Failed to run simulation. Please ensure the backend is running on port 5000.');
+      alert('Failed to run simulation. Please ensure the backend is running.');
     } finally {
       setIsLoading(false);
     }

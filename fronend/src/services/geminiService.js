@@ -1,5 +1,20 @@
 // Backend API Service
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const rawApiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
+const API_BASE_URL = rawApiBaseUrl.endsWith('/api') ? rawApiBaseUrl : `${rawApiBaseUrl}/api`;
+
+const sentimentFromBacklash = (backlashProbability) => {
+  const normalized = Number(backlashProbability) || 0;
+  return Math.round((50 - normalized) * 2);
+};
+
+const normalizeReaction = (reaction, concept, index) => ({
+  id: reaction.id || `reaction-${index}`,
+  personaName: reaction.personaName || `Persona ${index + 1}`,
+  sentiment: reaction.sentiment || 'neutral',
+  tone: reaction.tone || 'analytical',
+  postContent: reaction.postContent || reaction.post || `Response to ${concept}`,
+  influenceWeight: reaction.influenceWeight ?? 0.5,
+});
 
 export const runSimulation = async (concept, audience) => {
   try {
@@ -20,19 +35,19 @@ export const runSimulation = async (concept, audience) => {
 
     const data = await response.json();
     
+    const backlashProbability = Number(data.backlash_probability ?? data.backlash_score ?? 0);
+    const sentimentScore = Number(data.sentiment_score ?? data.sentimentScore ?? sentimentFromBacklash(backlashProbability));
+    const reactions = (data.reactions || data.sample_posts || []).map((reaction, idx) =>
+      normalizeReaction(reaction, data.concept, idx)
+    );
+
     return {
       ...data,
-      summary: `Simulation results for "${data.concept}" targeting ${data.audience}. Backlash probability: ${data.backlash_score}%`,
+      summary: data.summary || `Simulation results for "${data.concept}" targeting ${data.audience}. Backlash probability: ${backlashProbability}%`,
       audienceType: data.audience,
-      backlashProbability: data.backlash_score,
-      sentimentScore: Math.round((Math.random() * 140 - 70)),
-      reactions: (data.sample_posts || []).map((post, idx) => ({
-        id: `p${idx + 1}`,
-        personaName: `Persona ${idx + 1}`,
-        sentiment: 'neutral',
-        postContent: post.content || `Response to ${data.concept}`,
-        tone: 'analytical'
-      }))
+      backlashProbability,
+      sentimentScore,
+      reactions
     };
   } catch (error) {
     console.error('Simulation failed:', error);
@@ -63,7 +78,9 @@ export const refinePolicy = async (concept, summary) => {
     const data = await response.json();
     
     return {
-      policy: data.policy || `Refined policy based on: ${concept}`,
+      policy: data.improvedConcept || data.policy || `Refined policy based on: ${concept}`,
+      improvedConcept: data.improvedConcept || data.policy || `Refined policy based on: ${concept}`,
+      reasoning: data.reasoning || data.recommendations || 'Implement changes in phases: Plan, Test, Deploy, Monitor',
       recommendations: data.recommendations || 'Implement changes in phases: Plan, Test, Deploy, Monitor'
     };
   } catch (error) {
@@ -95,6 +112,12 @@ export const generateReport = async (result) => {
     
     return {
       title: data.title || `Simulation Report: ${result.concept}`,
+      date: data.date,
+      executiveSummary: data.executiveSummary || `Comprehensive report for simulation analyzing "${result.concept}"`,
+      riskAnalysis: data.riskAnalysis,
+      demographicImpact: data.demographicImpact,
+      strategicRecommendations: data.strategicRecommendations || [],
+      conclusion: data.conclusion,
       content: data.content || `Comprehensive report for simulation analyzing "${result.concept}"`,
       metadata: {
         generatedAt: new Date().toISOString(),
