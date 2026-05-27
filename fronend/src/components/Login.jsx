@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, X, ChevronDown } from 'lucide-react';
+import logo from '../assets/RaawaAI_logo.png';
 
 const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,21 +20,9 @@ const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
     <div className="w-full text-slate-100 flex flex-col font-sans">
       <header className="w-full border-b border-white/5 py-6 px-12 flex justify-between items-center bg-[#050816]">
         <button className="flex items-center space-x-3 cursor-pointer group" onClick={onBack}>
-          <div className="w-10 h-10 relative flex items-center justify-center">
-            <svg viewBox="0 0 40 40" className="w-full h-full">
-              <circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#49C5E0]" />
-              <path d="M12 28V12H20C24 12 26 14 26 18C26 21 24 23 20 24L26 30V32H23L17 25H15V32H12Z" fill="url(#gradLogin)" />
-              <defs>
-                <linearGradient id="gradLogin" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: '#49C5E0', stopOpacity: 1 }} />
-                  <stop offset="100%" style={{ stopColor: '#1061CC', stopOpacity: 1 }} />
-                </linearGradient>
-              </defs>
-            </svg>
+          <div className="relative flex items-center justify-center">
+            <img src={logo} alt="RaawaAI logo" className="h-12 md:h-14 w-auto max-w-[180px] object-contain" />
           </div>
-          <span className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#49C5E0] to-[#1061CC] bg-clip-text text-transparent">
-            RAAWA AI
-          </span>
         </button>
       </header>
 

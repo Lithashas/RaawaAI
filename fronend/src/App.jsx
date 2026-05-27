@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -47,7 +47,30 @@ const App = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   };
 
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const raw = sessionStorage.getItem('pendingSimulation');
+    if (!raw) return;
+
+    try {
+      const pending = JSON.parse(raw);
+      if (pending?.concept) {
+        sessionStorage.removeItem('pendingSimulation');
+        handleStartSimulation(pending.concept, pending.audience);
+      }
+    } catch {
+      sessionStorage.removeItem('pendingSimulation');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
   const handleStartSimulation = async (concept, audience) => {
+    if (!isAuthenticated) {
+      sessionStorage.setItem('pendingSimulation', JSON.stringify({ concept, audience }));
+      navigate('/login', { state: { from: { pathname: '/simulator' } }, replace: true });
+      return;
+    }
+
     setIsLoading(true);
     setRefinement(null);
     setReport(null);
@@ -137,12 +160,38 @@ const App = () => {
 
           <Route
             path="/login"
-            element={<Login onBack={() => navigate('/')} onSignUp={() => navigate('/signup')} onSignInSuccess={(email, password) => { setUserEmail(email); setUserPassword(password); setIsAuthenticated(true); navigate('/agency-dashboard'); setShowSavePassword(true); }} />}
+            element={
+              <Login
+                onBack={() => navigate('/')}
+                onSignUp={() => navigate('/signup')}
+                onSignInSuccess={(email, password) => {
+                  setUserEmail(email);
+                  setUserPassword(password);
+                  setIsAuthenticated(true);
+                  const redirectTo = location.state?.from?.pathname || '/agency-dashboard';
+                  navigate(redirectTo, { replace: true });
+                  setShowSavePassword(true);
+                }}
+              />
+            }
           />
 
           <Route
             path="/signup"
-            element={<SignUp onBack={() => navigate('/')} onSignIn={() => navigate('/login')} onSignUpSuccess={(email, password) => { setUserEmail(email); setUserPassword(password); setIsAuthenticated(true); navigate('/agency-dashboard'); setShowSavePassword(true); }} />}
+            element={
+              <SignUp
+                onBack={() => navigate('/')}
+                onSignIn={() => navigate('/login')}
+                onSignUpSuccess={(email, password) => {
+                  setUserEmail(email);
+                  setUserPassword(password);
+                  setIsAuthenticated(true);
+                  const redirectTo = location.state?.from?.pathname || '/agency-dashboard';
+                  navigate(redirectTo, { replace: true });
+                  setShowSavePassword(true);
+                }}
+              />
+            }
           />
 
           <Route path="/agency-dashboard" element={requireAuth(<AgencyDashboard onNewSimulation={() => navigate('/simulator')} onSettings={() => { setLastView('/agency-dashboard'); navigate('/settings'); }} />)} />
