@@ -7,6 +7,7 @@ const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, o
   const showDashboardUI = isDashboard || isSettings;
 
   return (
+    <>
     <header className="w-full bg-[#050816] border-b border-white/5 py-4">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <div className="flex items-center space-x-3">
@@ -149,6 +150,7 @@ const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, o
         </div>
       </div>
     )}
+    </>
   );
 };
 
