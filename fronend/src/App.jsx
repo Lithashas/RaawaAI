@@ -21,6 +21,7 @@ import Settings from './components/Settings';
 import SavePasswordDialog from './components/SavePasswordDialog';
 import Footer from './components/Footer';
 import { runSimulation, refinePolicy, generateReport, saveSimulationId } from './services/geminiService';
+import { ChevronLeft } from 'lucide-react';
 
 const App = () => {
   const navigate = useNavigate();
@@ -127,13 +128,14 @@ const App = () => {
     navigate('/');
   };
 
-  const view = location.pathname.includes('dashboard') || location.pathname.includes('settings') ? 'agency-dashboard' : 'landing';
+  const view = isAuthenticated ? 'agency-dashboard' : 'landing';
 
   return (
     <div className="min-h-screen bg-[#020617] text-white flex flex-col relative">
       <Header
         view={view}
         userRole={userRole}
+        currentPath={location.pathname}
         onHome={() => navigate('/')}
         onStart={() => navigate('/simulator')}
         onSignIn={() => navigate('/login')}
@@ -204,6 +206,15 @@ const App = () => {
             path="/simulator"
             element={
               <div className="max-w-7xl mx-auto px-6 py-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[calc(100vh-80px)]">
+                <button
+                  type="button"
+                  onClick={() => navigate(isAuthenticated ? '/agency-dashboard' : '/')}
+                  className="flex items-center space-x-2 text-slate-500 hover:text-slate-300 transition-colors group"
+                >
+                  <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                  <span className="text-sm font-medium">Back to Home Page</span>
+                </button>
+
                 <div className="text-center mb-8">
                   <h1 className="text-5xl font-black mb-4 tracking-tight bg-gradient-to-r from-[#69D2E9] to-[#3498DB] bg-clip-text text-transparent">RaawaAI</h1>
                   <p className="text-slate-500 font-medium text-lg uppercase tracking-widest">

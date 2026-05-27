@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, X, ChevronDown } from 'lucide-react';
-import logo from '../assets/RaawaAI_logo.png';
+import { Mail, Lock, Eye, EyeOff, X, ChevronDown, ChevronLeft } from 'lucide-react';
 
 const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,14 +17,6 @@ const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
 
   return (
     <div className="w-full text-slate-100 flex flex-col font-sans">
-      <header className="w-full border-b border-white/5 py-6 px-12 flex justify-between items-center bg-[#050816]">
-        <button className="flex items-center space-x-3 cursor-pointer group" onClick={onBack}>
-          <div className="relative flex items-center justify-center">
-            <img src={logo} alt="RaawaAI logo" className="h-12 md:h-14 w-auto max-w-[180px] object-contain" />
-          </div>
-        </button>
-      </header>
-
       <main className="flex-grow flex flex-col items-center relative px-6 pt-12 pb-32">
         <button
           onClick={onBack}
@@ -46,6 +37,15 @@ const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
         </button>
 
         <div className="w-full max-w-[480px] flex flex-col items-center mt-8">
+          <button
+            type="button"
+            onClick={onBack}
+            className="self-start flex items-center space-x-2 text-slate-500 hover:text-slate-300 transition-colors group mb-6"
+          >
+            <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm font-medium">Back to Home Page</span>
+          </button>
+
           <h1 className="text-3xl font-medium mb-2 tracking-tight">Welcome Back</h1>
           <p className="text-blue-500 text-sm mb-10 font-medium">Sign in to your account to continue</p>
 

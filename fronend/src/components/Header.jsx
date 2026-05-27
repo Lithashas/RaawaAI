@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import logo from '../assets/RaawaAI_logo.png';
 
-const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, onOrganizations, onUpgrade, onProfile, onReviewer, view, userRole = 'Agent' }) => {
+const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, onOrganizations, onUpgrade, onProfile, onReviewer, view, userRole = 'Agent', currentPath = '' }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isDashboard = view === 'agency-dashboard';
   const isSettings = view === 'settings';
   const showDashboardUI = isDashboard || isSettings;
+  const isOnSimulator = currentPath === '/simulator';
 
   return (
     <>
