@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Login from './components/Login';
@@ -9,224 +10,199 @@ import Dashboard from './components/Dashboard';
 import RefinementPanel from './components/RefinementPanel';
 import ReportViewer from './components/ReportViewer';
 import Organizations from './components/Organizations';
-import Reports from './components/Reports';
-import StrategicReport from './components/StrategicReport';
-import OptimizationReport from './components/OptimizationReport';
-import NewOrganization from './components/NewOrganization';
-import Upgrade from './components/Upgrade';
-import ReviewerDashboard from './components/ReviewerDashboard';
-import Profile from './components/Profile';
-import Settings from './components/Settings.jsx';
-import Footer from './components/Footer';
-import SavePasswordDialog from './components/SavePasswordDialog';
-import { runSimulation, refinePolicy, generateReport, saveSimulationId } from './services/geminiService';
-
-const App = () => {
-  const [view, setView] = useState('landing');
-  const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [refinement, setRefinement] = useState(null);
-  const [report, setReport] = useState(null);
-  const [isRefining, setIsRefining] = useState(false);
-  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
-  const [showSavePassword, setShowSavePassword] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
-  const [userPassword, setUserPassword] = useState('');
-  const [lastView, setLastView] = useState('landing');
-
-  const handleStartSimulation = async (concept, audience) => {
-    setIsLoading(true);
-    setRefinement(null);
-    setReport(null);
-    try {
-      const data = await runSimulation(concept, audience);
-      setResult(data);
-      // Save simulation ID for later API calls
-      if (data.simulation_id) {
-        saveSimulationId(data.simulation_id);
-      }
-    } catch (error) {
-      console.error("Simulation failed:", error);
-      alert('Failed to run simulation. Please ensure the backend is running.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRefine = async () => {
-    if (!result) return;
-    setIsRefining(true);
-    try {
-      const data = await refinePolicy(result.concept, result.summary);
-      setRefinement(data);
-    } catch (error) {
-      console.error("Refinement failed:", error);
-      alert('Failed to refine policy.');
-    } finally {
-      setIsRefining(false);
-    }
-  };
-
-  const handleGenerateReport = async () => {
-    if (!result) return;
-    setIsGeneratingReport(true);
-    try {
-      const data = await generateReport(result);
-      setReport(data);
-    } catch (error) {
-      console.error("Report generation failed:", error);
-    } finally {
-      setIsGeneratingReport(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-[#050816] text-slate-100 selection:bg-blue-500/30 flex flex-col">
-      {view !== 'signup' && (
-        <Header 
-          onHome={() => setView('landing')}
-          onSignIn={() => setView('login')}
-          onStart={() => setView('simulator')}
-          onSignOut={() => setView('landing')}
-          onSettings={() => {
-            setLastView(view);
-            setView('settings');
-          }}
-          view={view}
-        />
-      )}
-
       <main className="flex-grow relative">
-        {view === 'landing' && (
-          <div className="max-w-7xl mx-auto px-6">
-            <Hero onStart={() => setView('simulator')} onReview={() => setView('reviewer')} />
-          </div>
-        )}
-        
-        {view === 'login' && (
-          <Login 
-            onBack={() => setView('landing')} 
-            onSignUp={() => setView('signup')} 
-            onSignInSuccess={(email, password) => {
-              setUserEmail(email);
-              setUserPassword(password);
-              setView('agency-dashboard');
-              setShowSavePassword(true);
-            }}
-          />
-        )}
+        {/* Simple route guard component */}
+        {/** Usage: <RequireAuth><ProtectedComponent /></RequireAuth> */}
 
-        {view === 'signup' && (
-          <SignUp 
-            onBack={() => setView('landing')} 
-            onSignIn={() => setView('login')} 
-            onSignUpSuccess={(email, password) => {
-              setUserEmail(email);
-              setUserPassword(password);
-              setView('agency-dashboard');
-              setShowSavePassword(true);
-            }}
-          />
-        )}
+        {/** RequireAuth closes over `isAuthenticated` and `location` */}
+        {/** eslint-disable-next-line react/prop-types */}
+        {/* inline wrapper */}
+        
+        <Routes>
+          <Route path="/" element={<div className="max-w-7xl mx-auto px-6"><Hero onStart={() => navigate('/simulator')} onReview={() => navigate('/reviewer')} /></div>} />
 
-        {view === 'agency-dashboard' && (
-          <AgencyDashboard 
-            onNewSimulation={() => setView('simulator')} 
-            onSettings={() => {
-              setLastView('agency-dashboard');
-              setView('settings');
-            }}
-          />
-        )}
+          <Route path="/login" element={<Login onBack={() => navigate('/')} onSignUp={() => navigate('/signup')} onSignInSuccess={(email, password) => { setUserEmail(email); setUserPassword(password); setIsAuthenticated(true); navigate('/agency-dashboard'); setShowSavePassword(true); }} />} />
+
+          <Route path="/signup" element={<SignUp onBack={() => navigate('/')} onSignIn={() => navigate('/login')} onSignUpSuccess={(email, password) => { setUserEmail(email); setUserPassword(password); setIsAuthenticated(true); navigate('/agency-dashboard'); setShowSavePassword(true); }} />} />
+
+          {/* Protected routes */}
+          <Route path="/agency-dashboard" element={
+            isAuthenticated ? (
+              <AgencyDashboard onNewSimulation={() => navigate('/simulator')} onSettings={() => { setLastView('/agency-dashboard'); navigate('/settings'); }} />
+            ) : (
+              <Navigate to="/login" state={{ from: location }} replace />
+            )
+          } />
+
+          <Route path="/settings" element={
+            isAuthenticated ? (
+              <Settings onBack={() => { navigate(lastView || '/'); }} />
+            ) : (
+              <Navigate to="/login" state={{ from: location }} replace />
+            )
+          } />
+
+          <Route path="/profile" element={
+            isAuthenticated ? (
+              <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Profile /></div>
+            ) : (
+              <Navigate to="/login" state={{ from: location }} replace />
+            )
+          } />
+
+          <Route path="/organizations" element={
+            isAuthenticated ? (
+              <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Organizations onBack={() => navigate('/simulator')} onCreateOrg={() => navigate('/organizations/new')} /></div>
+            ) : (
+              <Navigate to="/login" state={{ from: location }} replace />
+            )
+          } />
+
+          <Route path="/organizations/new" element={
+            isAuthenticated ? (
+              <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><NewOrganization onBack={() => navigate('/organizations')} /></div>
+            ) : (
+              <Navigate to="/login" state={{ from: location }} replace />
+            )
+          } />
+
+          <Route path="/simulator" element={<div className="max-w-7xl mx-auto px-6 py-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[calc(100vh-80px)]">
+              <div className="text-center mb-8">
+                <h1 className="text-5xl font-black mb-4 tracking-tight bg-gradient-to-r from-[#69D2E9] to-[#3498DB] bg-clip-text text-transparent">RaawaAI</h1>
+                <p className="text-slate-500 font-medium text-lg uppercase tracking-widest">
+                  Predicting Human Resonance via Multi-Agent Personas
+                </p>
+              </div>
+
+              <SimulationForm onSubmit={handleStartSimulation} isLoading={isLoading} />
+
+              {result && (
+                <Dashboard 
+                  result={result} 
+                  onRefine={handleRefine}
+                  onGenerateReport={handleGenerateReport}
+                  isRefining={isRefining}
+                  isGeneratingReport={isGeneratingReport}
+                />
+              )}
+
+              {refinement && (
+                <RefinementPanel 
+                  refinement={refinement} 
+                  onClose={() => setRefinement(null)} 
+                />
+              )}
+            </div>} />
+
+          <Route path="/reports" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Reports onBack={() => navigate('/simulator')} onDetailedReport={() => navigate('/reports/strategic')} onOptimizeConcept={() => navigate('/reports/optimization')} /></div>} />
+
+          <Route path="/reports/strategic" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><StrategicReport onBack={() => navigate('/reports')} /></div>} />
+
+          <Route path="/reports/optimization" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><OptimizationReport onBack={() => navigate('/reports')} /></div>} />
+
+          <Route path="/upgrade" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Upgrade onBack={() => navigate('/simulator')} /></div>} />
+
+          <Route path="/reviewer" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><ReviewerDashboard onBack={() => navigate('/simulator')} /></div>} />
+
+          <Route path="/profile" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Profile /></div>} />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
         
-        {view === 'settings' && (
-          <Settings onBack={() => setView(lastView)} />
-        )}
         
-        {view === 'simulator' && (
-          <div className="max-w-7xl mx-auto px-6 py-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[calc(100vh-80px)]">
-            <div className="text-center mb-8">
-              <h1 className="text-5xl font-black mb-4 tracking-tight bg-gradient-to-r from-[#69D2E9] to-[#3498DB] bg-clip-text text-transparent">RaawaAI</h1>
-              <p className="text-slate-500 font-medium text-lg uppercase tracking-widest">
-                Predicting Human Resonance via Multi-Agent Personas
-              </p>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <Route path="/" element={<div className="max-w-7xl mx-auto px-6"><Hero onStart={() => navigate('/simulator')} onReview={() => navigate('/reviewer')} /></div>} />
+
+          <Route path="/login" element={<Login onBack={() => navigate('/')} onSignUp={() => navigate('/signup')} onSignInSuccess={(email, password) => { setUserEmail(email); setUserPassword(password); setIsAuthenticated(true); navigate('/agency-dashboard'); setShowSavePassword(true); }} />} />
+
+          <Route path="/signup" element={<SignUp onBack={() => navigate('/')} onSignIn={() => navigate('/login')} onSignUpSuccess={(email, password) => { setUserEmail(email); setUserPassword(password); setIsAuthenticated(true); navigate('/agency-dashboard'); setShowSavePassword(true); }} />} />
+
+          <Route path="/settings" element={isAuthenticated ? <Settings onBack={() => { navigate(lastView || '/'); }} /> : navigate('/login')} />
+
+          <Route path="/simulator" element={
+            <div className="max-w-7xl mx-auto px-6 py-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[calc(100vh-80px)]">
+              <div className="text-center mb-8">
+                <h1 className="text-5xl font-black mb-4 tracking-tight bg-gradient-to-r from-[#69D2E9] to-[#3498DB] bg-clip-text text-transparent">RaawaAI</h1>
+                <p className="text-slate-500 font-medium text-lg uppercase tracking-widest">
+                  Predicting Human Resonance via Multi-Agent Personas
+                </p>
+              </div>
+
+              <SimulationForm onSubmit={handleStartSimulation} isLoading={isLoading} />
+
+              {result && (
+                <Dashboard 
+                  result={result} 
+                  onRefine={handleRefine}
+                  onGenerateReport={handleGenerateReport}
+                  isRefining={isRefining}
+                  isGeneratingReport={isGeneratingReport}
+                />
+              )}
+
+              {refinement && (
+                <RefinementPanel 
+                  refinement={refinement} 
+                  onClose={() => setRefinement(null)} 
+                />
+              )}
             </div>
+          } />
 
-            <SimulationForm onSubmit={handleStartSimulation} isLoading={isLoading} />
+          <Route path="/organizations" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Organizations onBack={() => navigate('/simulator')} onCreateOrg={() => navigate('/organizations/new')} /></div>} />
 
-            {result && (
-              <Dashboard 
-                result={result} 
-                onRefine={handleRefine}
-                onGenerateReport={handleGenerateReport}
-                isRefining={isRefining}
-                isGeneratingReport={isGeneratingReport}
-              />
-            )}
+          <Route path="/organizations/new" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><NewOrganization onBack={() => navigate('/organizations')} /></div>} />
 
-            {refinement && (
-              <RefinementPanel 
-                refinement={refinement} 
-                onClose={() => setRefinement(null)} 
-              />
-            )}
-          </div>
-        )}
+          <Route path="/reports" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Reports onBack={() => navigate('/simulator')} onDetailedReport={() => navigate('/reports/strategic')} onOptimizeConcept={() => navigate('/reports/optimization')} /></div>} />
 
-        {view === 'organizations' && (
-          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
-            <Organizations 
-              onBack={() => setView('simulator')} 
-              onCreateOrg={() => setView('newOrganization')} 
-            />
-          </div>
-        )}
+          <Route path="/reports/strategic" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><StrategicReport onBack={() => navigate('/reports')} /></div>} />
 
-        {view === 'reports' && (
-          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
-            <Reports 
-              onBack={() => setView('simulator')} 
-              onDetailedReport={() => setView('strategicReport')} 
-              onOptimizeConcept={() => setView('optimizationReport')} 
-            />
-          </div>
-        )}
+          <Route path="/reports/optimization" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><OptimizationReport onBack={() => navigate('/reports')} /></div>} />
 
-        {view === 'strategicReport' && (
-          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
-            <StrategicReport onBack={() => setView('reports')} />
-          </div>
-        )}
+          <Route path="/upgrade" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Upgrade onBack={() => navigate('/simulator')} /></div>} />
 
-        {view === 'optimizationReport' && (
-          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
-            <OptimizationReport onBack={() => setView('reports')} />
-          </div>
-        )}
+          <Route path="/reviewer" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><ReviewerDashboard onBack={() => navigate('/simulator')} /></div>} />
 
-        {view === 'newOrganization' && (
-          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
-            <NewOrganization onBack={() => setView('organizations')} />
-          </div>
-        )}
+          <Route path="/profile" element={<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Profile /></div>} />
 
-        {view === 'upgrade' && (
-          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
-            <Upgrade onBack={() => setView('simulator')} />
-          </div>
-        )}
-
-        {view === 'reviewer' && (
-          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
-            <ReviewerDashboard onBack={() => setView('simulator')} />
-          </div>
-        )}
-
-        {view === 'profile' && (
-          <div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]">
-            <Profile />
-          </div>
-        )}
+          <Route path="/" />
+        </Routes>
+        
+        
       </main>
 
       <Footer />
