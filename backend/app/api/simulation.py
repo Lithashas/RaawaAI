@@ -5,6 +5,7 @@ from datetime import datetime
 from app.models.simulation import SimulationRequest
 from app.models.persona import Persona
 from app.services.persona_engine import simulate_day
+from app.services.multi_agent_engine import run_simulation
 from app.services.dynamodb_service import save_simulation, save_refinement, save_report
 from app.services.sentiment import extract_sentiment
 
@@ -179,3 +180,38 @@ def list_simulations():
     
     simulations = get_all_simulations()
     return {"simulations": simulations, "count": len(simulations)}
+
+
+@router.post("/simulation/multi_start")
+def start_multi_simulation(req: SimulationRequest):
+    """Run a richer multi-agent simulation using LLMs and aggregation logic."""
+    audience = req.audience if isinstance(req.audience, dict) else {"demographics": [req.audience or "General"], "regions": ["Sri Lanka"]}
+    result = run_simulation(req.concept, audience, days=30, sampling=6)
+
+    # Persist summary similar to existing endpoint
+    summary = result.get("summary", {})
+    simulation_id = str(uuid.uuid4())
+    try:
+        save_simulation(
+            simulation_id=simulation_id,
+            concept=req.concept,
+            audience=audience,
+            backlash_score=result.get("backlash_probability", 0),
+            sample_posts=result.get("sample_posts", []),
+            metadata={
+                "summary": summary,
+                "heatmap": result.get("heatmap"),
+            }
+        )
+    except Exception as e:
+        print(f"Warning: Could not save multi simulation: {e}")
+
+    return {
+        "simulation_id": simulation_id,
+        "concept": req.concept,
+        "audience": audience,
+        "backlash_probability": result.get("backlash_probability"),
+        "heatmap": result.get("heatmap"),
+        "sample_posts": result.get("sample_posts"),
+        "refinement": result.get("refinement"),
+    }
