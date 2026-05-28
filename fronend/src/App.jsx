@@ -18,6 +18,8 @@ import Upgrade from './components/Upgrade';
 import ReviewerDashboard from './components/ReviewerDashboard';
 import Profile from './components/Profile';
 import Settings from './components/Settings';
+import ChangePlan from './components/ChangePlan';
+import PaymentMethods from './components/PaymentMethods';
 import SavePasswordDialog from './components/SavePasswordDialog';
 import Footer from './components/Footer';
 import { runSimulation, refinePolicy, generateReport, saveSimulationId } from './services/geminiService';
@@ -198,6 +200,8 @@ const App = () => {
 
           <Route path="/agency-dashboard" element={requireAuth(<AgencyDashboard onNewSimulation={() => navigate('/simulator')} onSettings={() => { setLastView('/agency-dashboard'); navigate('/settings'); }} />)} />
           <Route path="/settings/*" element={requireAuth(<Settings onBack={() => navigate(lastView || '/agency-dashboard')} />)} />
+          <Route path="/settings/subs/change-plan" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><ChangePlan onBack={() => navigate('/settings/subs')} /></div>)} />
+          <Route path="/settings/subs/payment-methods" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><PaymentMethods onBack={() => navigate('/settings/subs')} /></div>)} />
           <Route path="/profile" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Profile /></div>)} />
           <Route path="/organizations" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Organizations onBack={() => navigate('/simulator')} onCreateOrg={() => navigate('/organizations/new')} /></div>)} />
           <Route path="/organizations/new" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><NewOrganization onBack={() => navigate('/organizations')} /></div>)} />
