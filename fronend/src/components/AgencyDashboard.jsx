@@ -15,7 +15,7 @@ const Dashboard = ({ onNewSimulation, onSettings }) => {
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-6 py-12 text-slate-100 font-sans">
+    <div className="w-full px-6 py-12 text-slate-100 font-sans">
       <div className="flex justify-between items-start mb-16">
         <div>
           <h1 className="text-4xl font-bold text-white mb-2">Agency Dashboard</h1>

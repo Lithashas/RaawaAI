@@ -75,7 +75,7 @@ const Hero = ({ onStart, onReview }) => {
       <div className="absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(circle_at_top,_rgba(73,197,224,0.16),_transparent_60%)] -z-10" />
       <div className="absolute left-1/2 top-24 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[140px] -z-10" />
 
-      <section className="mx-auto flex min-h-[calc(100vh-112px)] max-w-7xl flex-col items-center justify-center text-center">
+      <section className="w-full flex min-h-[calc(100vh-112px)] flex-col items-center justify-center text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.28em] text-[#69D2E9] backdrop-blur-sm">
           <Activity size={12} />
           Multi-agent persona engine v3.1
@@ -121,7 +121,7 @@ const Hero = ({ onStart, onReview }) => {
         </div>
       </section>
 
-      <section className="mx-auto mt-24 grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <section className="w-full mt-24 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
         {featureCards.map((card) => {
           const Icon = card.icon;
 
@@ -137,7 +137,7 @@ const Hero = ({ onStart, onReview }) => {
         })}
       </section>
 
-      <section id="overview" className="mx-auto mt-24 max-w-7xl rounded-[2rem] border border-white/10 bg-[#07101e]/80 p-8 shadow-2xl shadow-black/20 backdrop-blur-sm md:p-10">
+      <section id="overview" className="w-full mt-24 rounded-[2rem] border border-white/10 bg-[#07101e]/80 p-8 shadow-2xl shadow-black/20 backdrop-blur-sm md:p-10">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
@@ -186,7 +186,7 @@ const Hero = ({ onStart, onReview }) => {
         </div>
       </section>
 
-      <section className="mx-auto mt-24 max-w-7xl">
+      <section className="w-full mt-24">
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-300">
@@ -255,7 +255,7 @@ const Hero = ({ onStart, onReview }) => {
         </div>
       </section>
 
-      <section className="mx-auto mt-24 max-w-7xl rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#0a1426] to-[#050816] p-8 md:p-10">
+      <section className="w-full mt-24 rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#0a1426] to-[#050816] p-8 md:p-10">
         <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-300">
@@ -285,7 +285,7 @@ const Hero = ({ onStart, onReview }) => {
         </div>
       </section>
 
-      <section className="mx-auto mt-24 max-w-7xl rounded-[2rem] border border-white/10 bg-white/[0.04] p-8 md:p-10">
+      <section className="w-full mt-24 rounded-[2rem] border border-white/10 bg-white/[0.04] p-8 md:p-10">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="text-xs uppercase tracking-[0.26em] text-slate-500">Team Exyra</div>
