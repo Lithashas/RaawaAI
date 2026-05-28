@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -21,6 +21,7 @@ import Settings from './components/Settings';
 import SavePasswordDialog from './components/SavePasswordDialog';
 import Footer from './components/Footer';
 import { runSimulation, refinePolicy, generateReport, saveSimulationId } from './services/geminiService';
+import { ChevronLeft } from 'lucide-react';
 
 const App = () => {
   const navigate = useNavigate();
@@ -47,7 +48,30 @@ const App = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   };
 
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const raw = sessionStorage.getItem('pendingSimulation');
+    if (!raw) return;
+
+    try {
+      const pending = JSON.parse(raw);
+      if (pending?.concept) {
+        sessionStorage.removeItem('pendingSimulation');
+        handleStartSimulation(pending.concept, pending.audience);
+      }
+    } catch {
+      sessionStorage.removeItem('pendingSimulation');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
   const handleStartSimulation = async (concept, audience) => {
+    if (!isAuthenticated) {
+      sessionStorage.setItem('pendingSimulation', JSON.stringify({ concept, audience }));
+      navigate('/login', { state: { from: { pathname: '/simulator' } }, replace: true });
+      return;
+    }
+
     setIsLoading(true);
     setRefinement(null);
     setReport(null);
@@ -104,13 +128,14 @@ const App = () => {
     navigate('/');
   };
 
-  const view = location.pathname.includes('dashboard') || location.pathname.includes('settings') ? 'agency-dashboard' : 'landing';
+  const view = isAuthenticated ? 'agency-dashboard' : 'landing';
 
   return (
     <div className="min-h-screen bg-[#020617] text-white flex flex-col relative">
       <Header
         view={view}
         userRole={userRole}
+        currentPath={location.pathname}
         onHome={() => navigate('/')}
         onStart={() => navigate('/simulator')}
         onSignIn={() => navigate('/login')}
@@ -137,12 +162,38 @@ const App = () => {
 
           <Route
             path="/login"
-            element={<Login onBack={() => navigate('/')} onSignUp={() => navigate('/signup')} onSignInSuccess={(email, password) => { setUserEmail(email); setUserPassword(password); setIsAuthenticated(true); navigate('/agency-dashboard'); setShowSavePassword(true); }} />}
+            element={
+              <Login
+                onBack={() => navigate('/')}
+                onSignUp={() => navigate('/signup')}
+                onSignInSuccess={(email, password) => {
+                  setUserEmail(email);
+                  setUserPassword(password);
+                  setIsAuthenticated(true);
+                  const redirectTo = location.state?.from?.pathname || '/agency-dashboard';
+                  navigate(redirectTo, { replace: true });
+                  setShowSavePassword(true);
+                }}
+              />
+            }
           />
 
           <Route
             path="/signup"
-            element={<SignUp onBack={() => navigate('/')} onSignIn={() => navigate('/login')} onSignUpSuccess={(email, password) => { setUserEmail(email); setUserPassword(password); setIsAuthenticated(true); navigate('/agency-dashboard'); setShowSavePassword(true); }} />}
+            element={
+              <SignUp
+                onBack={() => navigate('/')}
+                onSignIn={() => navigate('/login')}
+                onSignUpSuccess={(email, password) => {
+                  setUserEmail(email);
+                  setUserPassword(password);
+                  setIsAuthenticated(true);
+                  const redirectTo = location.state?.from?.pathname || '/agency-dashboard';
+                  navigate(redirectTo, { replace: true });
+                  setShowSavePassword(true);
+                }}
+              />
+            }
           />
 
           <Route path="/agency-dashboard" element={requireAuth(<AgencyDashboard onNewSimulation={() => navigate('/simulator')} onSettings={() => { setLastView('/agency-dashboard'); navigate('/settings'); }} />)} />
@@ -154,7 +205,16 @@ const App = () => {
           <Route
             path="/simulator"
             element={
-              <div className="w-full px-6 py-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[calc(100vh-80px)]">
+              <div className="max-w-7xl mx-auto px-6 py-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[calc(100vh-80px)]">
+                <button
+                  type="button"
+                  onClick={() => navigate(isAuthenticated ? '/agency-dashboard' : '/')}
+                  className="flex items-center space-x-2 text-slate-500 hover:text-slate-300 transition-colors group"
+                >
+                  <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                  <span className="text-sm font-medium">Back to Home Page</span>
+                </button>
+
                 <div className="text-center mb-8">
                   <h1 className="text-5xl font-black mb-4 tracking-tight bg-gradient-to-r from-[#69D2E9] to-[#3498DB] bg-clip-text text-transparent">RaawaAI</h1>
                   <p className="text-slate-500 font-medium text-lg uppercase tracking-widest">

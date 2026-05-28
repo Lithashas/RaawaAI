@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, X, ChevronDown } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, X, ChevronDown, ChevronLeft } from 'lucide-react';
 
 const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,26 +17,6 @@ const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
 
   return (
     <div className="w-full text-slate-100 flex flex-col font-sans">
-      <header className="w-full border-b border-white/5 py-6 px-12 flex justify-between items-center bg-[#050816]">
-        <button className="flex items-center space-x-3 cursor-pointer group" onClick={onBack}>
-          <div className="w-10 h-10 relative flex items-center justify-center">
-            <svg viewBox="0 0 40 40" className="w-full h-full">
-              <circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#49C5E0]" />
-              <path d="M12 28V12H20C24 12 26 14 26 18C26 21 24 23 20 24L26 30V32H23L17 25H15V32H12Z" fill="url(#gradLogin)" />
-              <defs>
-                <linearGradient id="gradLogin" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: '#49C5E0', stopOpacity: 1 }} />
-                  <stop offset="100%" style={{ stopColor: '#1061CC', stopOpacity: 1 }} />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <span className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#49C5E0] to-[#1061CC] bg-clip-text text-transparent">
-            RAAWA AI
-          </span>
-        </button>
-      </header>
-
       <main className="flex-grow flex flex-col items-center relative px-6 pt-12 pb-32">
         <button
           onClick={onBack}
@@ -57,6 +37,15 @@ const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
         </button>
 
         <div className="w-full max-w-[480px] flex flex-col items-center mt-8">
+          <button
+            type="button"
+            onClick={onBack}
+            className="self-start flex items-center space-x-2 text-slate-500 hover:text-slate-300 transition-colors group mb-6"
+          >
+            <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm font-medium">Back to Home Page</span>
+          </button>
+
           <h1 className="text-3xl font-medium mb-2 tracking-tight">Welcome Back</h1>
           <p className="text-blue-500 text-sm mb-10 font-medium">Sign in to your account to continue</p>
 
