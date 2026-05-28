@@ -1,11 +1,27 @@
 import React, { useState } from 'react';
 import logo from '../assets/RaawaAI_logo.png';
 
-const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, onOrganizations, onUpgrade, onProfile, onReviewer, view, userRole = 'Agent', currentPath = '' }) => {
+const Header = ({ 
+  onStart, 
+  onHome, 
+  onSignIn, 
+  onSignOut, 
+  onSettings, 
+  onReports, 
+  onOrganizations, 
+  onUpgrade, 
+  onProfile, 
+  onReviewer, 
+  onAbout, 
+  view, 
+  userRole = 'Agent', 
+  currentPath = '' 
+}) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const isDashboard = view === 'agency-dashboard';
   const isSettings = view === 'settings';
+  const isAbout = view === 'about';
   const showDashboardUI = isDashboard || isSettings;
   const isOnSimulator = currentPath === '/simulator';
 
@@ -78,16 +94,32 @@ const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, o
               </div>
             </div>
           ) : (
-            <div className="hidden md:flex items-center space-x-6 shrink-0">
+            <div className="hidden md:flex items-center space-x-8 shrink-0">
+              {isAbout && (
+                <button 
+                  onClick={onHome}
+                  className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
+                >
+                  Home
+                </button>
+              )}
+              <button 
+                onClick={onAbout}
+                className={`text-slate-300 hover:text-white text-sm font-medium transition-colors ${
+                  isAbout ? 'text-[#69D2E9]' : ''
+                }`}
+              >
+                About
+              </button>
               <button 
                 onClick={onSignIn}
-                className="text-slate-400 hover:text-white text-sm font-semibold transition"
+                className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
               >
                 Sign In
               </button>
               <button 
                 onClick={onStart}
-                className="bg-[#1a4f63] hover:bg-[#236a85] text-white px-4 py-2 rounded-md text-sm font-bold shadow-lg shadow-blue-900/10 transition-all active:scale-95"
+                className="bg-[#1a4f63] hover:bg-[#236a85] text-white px-5 py-2.5 rounded-md text-sm font-bold transition-all active:scale-95 shadow-lg shadow-blue-900/5"
               >
                 Get Started
               </button>
@@ -110,12 +142,22 @@ const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, o
     {mobileOpen && (
       <div className="md:hidden absolute left-0 right-0 top-full bg-[#050816] border-t border-white/5 z-40 animate-in slide-in-from-top-3 duration-200">
         <div className="w-full px-6 py-4 flex flex-col gap-2 transition-all duration-200 ease-out">
-          <button onClick={() => { setMobileOpen(false); onStart && onStart(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Simulator</button>
-          <button onClick={() => { setMobileOpen(false); onReports && onReports(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Reports</button>
-          {/* Organizations and Upgrade removed from mobile menu as well */}
-          <button onClick={() => { setMobileOpen(false); onProfile && onProfile(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Profile</button>
-          <button onClick={() => { setMobileOpen(false); onReviewer && onReviewer(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Reviewer</button>
-          <button onClick={() => { setMobileOpen(false); onSettings && onSettings(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Settings</button>
+          {showDashboardUI ? (
+            <>
+              <button onClick={() => { setMobileOpen(false); onStart && onStart(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Simulator</button>
+              <button onClick={() => { setMobileOpen(false); onReports && onReports(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Reports</button>
+              <button onClick={() => { setMobileOpen(false); onProfile && onProfile(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Profile</button>
+              <button onClick={() => { setMobileOpen(false); onReviewer && onReviewer(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Reviewer</button>
+              <button onClick={() => { setMobileOpen(false); onSettings && onSettings(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Settings</button>
+            </>
+          ) : (
+            <>
+              {isAbout && (
+                <button onClick={() => { setMobileOpen(false); onHome && onHome(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Home</button>
+              )}
+              <button onClick={() => { setMobileOpen(false); onAbout && onAbout(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 ${isAbout ? 'text-[#69D2E9]' : ''}`}>About</button>
+            </>
+          )}
           <div className="border-t border-white/5 mt-2 pt-2">
             {showDashboardUI ? (
               <button onClick={() => { setMobileOpen(false); onSignOut && onSignOut(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Sign Out</button>

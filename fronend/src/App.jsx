@@ -18,6 +18,7 @@ import Upgrade from './components/Upgrade';
 import ReviewerDashboard from './components/ReviewerDashboard';
 import Profile from './components/Profile';
 import Settings from './components/Settings';
+import About from './components/About';
 import ChangePlan from './components/ChangePlan';
 import PaymentMethods from './components/PaymentMethods';
 import SavePasswordDialog from './components/SavePasswordDialog';
@@ -130,7 +131,21 @@ const App = () => {
     navigate('/');
   };
 
-  const view = isAuthenticated ? 'agency-dashboard' : 'landing';
+  // Determine standard layout view parameter dynamically based on active route path
+  let view = isAuthenticated ? 'agency-dashboard' : 'landing';
+  if (location.pathname === '/about') {
+    view = 'about';
+  } else if (location.pathname === '/settings' || location.pathname.startsWith('/settings/')) {
+    view = 'settings';
+  } else if (location.pathname === '/agency-dashboard') {
+    view = 'agency-dashboard';
+  } else if (location.pathname === '/login') {
+    view = 'login';
+  } else if (location.pathname === '/signup') {
+    view = 'signup';
+  } else if (location.pathname === '/simulator') {
+    view = 'simulator';
+  }
 
   return (
     <div className="min-h-screen bg-[#020617] text-white flex flex-col relative">
@@ -142,6 +157,7 @@ const App = () => {
         onStart={() => navigate('/simulator')}
         onSignIn={() => navigate('/login')}
         onSignOut={handleSignOut}
+        onAbout={() => navigate('/about')}
         onSettings={() => {
           setLastView(location.pathname);
           navigate('/settings');
@@ -160,6 +176,11 @@ const App = () => {
           <Route
             path="/"
             element={<div className="w-full px-6"><Hero onStart={() => navigate('/simulator')} onReview={() => navigate('/reviewer')} /></div>}
+          />
+
+          <Route
+            path="/about"
+            element={<div className="max-w-7xl mx-auto px-6"><About /></div>}
           />
 
           <Route
@@ -267,6 +288,7 @@ const App = () => {
         />
       )}
 
+      {/* Decorative Background Elements */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-20 overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/5 blur-[150px] rounded-full"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-600/5 blur-[150px] rounded-full"></div>
