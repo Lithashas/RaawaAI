@@ -13,6 +13,7 @@ const Header = ({
   onProfile, 
   onReviewer, 
   onAbout, 
+  onDashboard,
   view, 
   isAuthenticated = false,
   userRole = 'Agent', 
@@ -23,6 +24,7 @@ const Header = ({
   const isDashboard = view === 'agency-dashboard';
   const isSettings = view === 'settings';
   const isAbout = view === 'about';
+  const isHome = view === 'home' || view === 'landing';
   const isSignUp = view === 'signup';
   const isLogIn = view === 'login';
   const showDashboardUI = isAuthenticated || isDashboard || isSettings;
@@ -49,7 +51,34 @@ const Header = ({
         
         <div className="flex items-center space-x-4 min-w-0 justify-end">
           {showDashboardUI ? (
-            <div className="hidden md:flex items-center space-x-4 shrink-0 relative">
+            <div className="hidden md:flex items-center space-x-6 shrink-0 relative">
+              <button 
+                onClick={onHome}
+                className={`text-sm font-medium transition-colors ${
+                  isHome ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
+                }`}
+              >
+                Home
+              </button>
+              <button 
+                onClick={onDashboard}
+                className={`text-sm font-medium transition-colors ${
+                  isDashboard ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
+                }`}
+              >
+                Agency Dashboard
+              </button>
+              <button 
+                onClick={onAbout}
+                className={`text-sm font-medium transition-colors ${
+                  isAbout ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
+                }`}
+              >
+                About
+              </button>
+              
+              <div className="h-4 w-px bg-white/10 mx-1" />
+
               <div className="flex items-center space-x-2 min-w-0">
                 <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
                 <span className="text-sm font-medium text-slate-300">Role: {userRole}</span>
@@ -58,7 +87,7 @@ const Header = ({
               <div className="relative">
                 <button
                   onClick={() => setAccountOpen((s) => !s)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-md bg-white/3 hover:bg-white/10 text-slate-200"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md bg-white/5 hover:bg-white/10 text-slate-200"
                 >
                   <span className="text-sm font-semibold">Account</span>
                 </button>
@@ -78,22 +107,24 @@ const Header = ({
               {showHomeButton && (
                 <button 
                   onClick={onHome}
-                  className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
+                  className={`text-sm font-medium transition-colors ${
+                    isHome ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
+                  }`}
                 >
                   Home
                 </button>
               )}
               <button 
                 onClick={onAbout}
-                className={`text-slate-300 hover:text-white text-sm font-medium transition-colors ${
-                  isAbout ? 'text-[#69D2E9]' : ''
+                className={`text-sm font-medium transition-colors ${
+                  isAbout ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
                 }`}
               >
                 About
               </button>
               <button 
                 onClick={onSignIn}
-                className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
+                className="text-white hover:text-white/85 text-sm font-medium transition-colors"
               >
                 Sign In
               </button>
@@ -118,15 +149,18 @@ const Header = ({
         <div className="w-full px-6 py-4 flex flex-col gap-2 transition-all duration-200 ease-out">
            {showDashboardUI ? (
             <>
-              <button onClick={() => { setMobileOpen(false); onProfile && onProfile(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Profile</button>
-              <button onClick={() => { setMobileOpen(false); onReviewer && onReviewer(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Reviewer</button>
+              <button onClick={() => { setMobileOpen(false); onHome && onHome(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isHome ? 'text-[#69D2E9]' : 'text-white'}`}>Home</button>
+              <button onClick={() => { setMobileOpen(false); onDashboard && onDashboard(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isDashboard ? 'text-[#69D2E9]' : 'text-white'}`}>Agency Dashboard</button>
+              <button onClick={() => { setMobileOpen(false); onAbout && onAbout(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isAbout ? 'text-[#69D2E9]' : 'text-white'}`}>About</button>
+              <button onClick={() => { setMobileOpen(false); onProfile && onProfile(); }} className="text-left px-3 py-2 rounded hover:bg-white/5 text-white">Profile</button>
+              <button onClick={() => { setMobileOpen(false); onReviewer && onReviewer(); }} className="text-left px-3 py-2 rounded hover:bg-white/5 text-white">Reviewer</button>
             </>
           ) : (
             <>
               {showHomeButton && (
-                <button onClick={() => { setMobileOpen(false); onHome && onHome(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Home</button>
+                <button onClick={() => { setMobileOpen(false); onHome && onHome(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isHome ? 'text-[#69D2E9]' : 'text-white'}`}>Home</button>
               )}
-              <button onClick={() => { setMobileOpen(false); onAbout && onAbout(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 ${isAbout ? 'text-[#69D2E9]' : ''}`}>About</button>
+              <button onClick={() => { setMobileOpen(false); onAbout && onAbout(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isAbout ? 'text-[#69D2E9]' : 'text-white'}`}>About</button>
             </>
           )}
           <div className="border-t border-white/5 mt-2 pt-2">

@@ -132,7 +132,9 @@ const App = () => {
 
   // Determine standard layout view parameter dynamically based on active route path
   let view = isAuthenticated ? 'agency-dashboard' : 'landing';
-  if (location.pathname === '/about') {
+  if (location.pathname === '/') {
+    view = 'home';
+  } else if (location.pathname === '/about') {
     view = 'about';
   } else if (location.pathname === '/settings' || location.pathname.startsWith('/settings/')) {
     view = 'settings';
@@ -154,6 +156,7 @@ const App = () => {
         userRole={userRole}
         currentPath={location.pathname}
         onHome={() => navigate('/')}
+        onDashboard={() => navigate('/agency-dashboard')}
         onStart={() => navigate('/simulator')}
         onSignIn={() => navigate('/login')}
         onSignOut={handleSignOut}
@@ -175,7 +178,7 @@ const App = () => {
 
           <Route
             path="/"
-            element={<div className="w-full px-6"><Hero onStart={() => navigate('/simulator')} onReview={() => navigate('/reviewer')} /></div>}
+            element={<div className="w-full px-6"><Hero onStart={() => navigate(isAuthenticated ? '/simulator' : '/login')} onReview={() => navigate(isAuthenticated ? '/reviewer' : '/login')} /></div>}
           />
 
           <Route
@@ -234,10 +237,10 @@ const App = () => {
                 <button
                   type="button"
                   onClick={() => navigate(isAuthenticated ? '/agency-dashboard' : '/')}
-                  className="flex items-center space-x-2 text-slate-500 hover:text-slate-300 transition-colors group"
+                  className="flex items-center space-x-2 text-white hover:text-slate-200 transition-colors group"
                 >
                   <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                  <span className="text-sm font-medium">Back to Home Page</span>
+                  <span className="text-sm font-medium">Back to Agency Dashboard</span>
                 </button>
 
                 <div className="text-center mb-8">
