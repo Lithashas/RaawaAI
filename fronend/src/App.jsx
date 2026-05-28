@@ -21,7 +21,6 @@ import Settings from './components/Settings';
 import About from './components/About';
 import ChangePlan from './components/ChangePlan';
 import PaymentMethods from './components/PaymentMethods';
-import SavePasswordDialog from './components/SavePasswordDialog';
 import Footer from './components/Footer';
 import { runSimulation, refinePolicy, generateReport, saveSimulationId } from './services/geminiService';
 import { ChevronLeft } from 'lucide-react';
@@ -148,9 +147,10 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white flex flex-col relative">
+    <div className="min-h-screen bg-[#020617] text-white flex flex-col relative animate-fade-in">
       <Header
         view={view}
+        isAuthenticated={isAuthenticated}
         userRole={userRole}
         currentPath={location.pathname}
         onHome={() => navigate('/')}
@@ -219,7 +219,7 @@ const App = () => {
             }
           />
 
-          <Route path="/agency-dashboard" element={requireAuth(<AgencyDashboard onNewSimulation={() => navigate('/simulator')} onSettings={() => { setLastView('/agency-dashboard'); navigate('/settings'); }} />)} />
+          <Route path="/agency-dashboard" element={requireAuth(<AgencyDashboard onNewSimulation={() => navigate('/simulator')} onSettings={() => { setLastView('/agency-dashboard'); navigate('/settings'); }} onReports={() => navigate('/reports')} />)} />
           <Route path="/settings/*" element={requireAuth(<Settings onBack={() => navigate(lastView || '/agency-dashboard')} />)} />
           <Route path="/settings/subs/change-plan" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><ChangePlan onBack={() => navigate('/settings/subs')} /></div>)} />
           <Route path="/settings/subs/payment-methods" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><PaymentMethods onBack={() => navigate('/settings/subs')} /></div>)} />
@@ -229,7 +229,7 @@ const App = () => {
 
           <Route
             path="/simulator"
-            element={
+            element={requireAuth(
               <div className="max-w-7xl mx-auto px-6 py-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[calc(100vh-80px)]">
                 <button
                   type="button"
@@ -261,10 +261,10 @@ const App = () => {
 
                 {refinement && <RefinementPanel refinement={refinement} onClose={() => setRefinement(null)} />}
               </div>
-            }
+            )}
           />
 
-          <Route path="/reports" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Reports onBack={() => navigate('/simulator')} onDetailedReport={() => navigate('/reports/strategic')} onOptimizeConcept={() => navigate('/reports/optimization')} /></div>)} />
+          <Route path="/reports" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Reports onBack={() => navigate('/agency-dashboard')} onDetailedReport={() => navigate('/reports/strategic')} onOptimizeConcept={() => navigate('/reports/optimization')} /></div>)} />
           <Route path="/reports/strategic" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><StrategicReport onBack={() => navigate('/reports')} /></div>)} />
           <Route path="/reports/optimization" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><OptimizationReport onBack={() => navigate('/reports')} /></div>)} />
           <Route path="/upgrade" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Upgrade onBack={() => navigate('/simulator')} /></div>)} />
@@ -277,16 +277,6 @@ const App = () => {
       <Footer />
 
       {report && <ReportViewer report={report} onClose={() => setReport(null)} />}
-
-      {showSavePassword && (
-        <SavePasswordDialog
-          email={userEmail}
-          password={userPassword}
-          onSave={() => setShowSavePassword(false)}
-          onNever={() => setShowSavePassword(false)}
-          onDismiss={() => setShowSavePassword(false)}
-        />
-      )}
 
       {/* Decorative Background Elements */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-20 overflow-hidden">
