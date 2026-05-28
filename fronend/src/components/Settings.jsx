@@ -26,7 +26,7 @@ const Settings = ({ onBack }) => {
 
   return (
     <div className="min-h-screen bg-[#050816] text-slate-100 font-sans pb-20">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="w-full px-6 py-8">
         {/* Breadcrumb */}
         <button 
           onClick={onBack}

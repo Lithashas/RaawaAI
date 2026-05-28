@@ -9,7 +9,7 @@ const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, o
   return (
     <>
     <header className="w-full bg-[#050816] border-b border-white/5 py-4">
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+      <div className="w-full px-6 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div 
             className="flex items-center space-x-3 cursor-pointer group"
@@ -129,7 +129,7 @@ const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, o
     </header>
     {mobileOpen && (
       <div className="md:hidden absolute left-0 right-0 top-full bg-[#050816] border-t border-white/5 z-40 animate-in slide-in-from-top-3 duration-200">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-2 transition-all duration-200 ease-out">
+        <div className="w-full px-6 py-4 flex flex-col gap-2 transition-all duration-200 ease-out">
           <button onClick={() => { setMobileOpen(false); onStart && onStart(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Simulator</button>
           <button onClick={() => { setMobileOpen(false); onReports && onReports(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Reports</button>
           <button onClick={() => { setMobileOpen(false); onOrganizations && onOrganizations(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Organizations</button>

@@ -132,7 +132,7 @@ const App = () => {
 
           <Route
             path="/"
-            element={<div className="max-w-7xl mx-auto px-6"><Hero onStart={() => navigate('/simulator')} onReview={() => navigate('/reviewer')} /></div>}
+            element={<div className="w-full px-6"><Hero onStart={() => navigate('/simulator')} onReview={() => navigate('/reviewer')} /></div>}
           />
 
           <Route
@@ -147,14 +147,14 @@ const App = () => {
 
           <Route path="/agency-dashboard" element={requireAuth(<AgencyDashboard onNewSimulation={() => navigate('/simulator')} onSettings={() => { setLastView('/agency-dashboard'); navigate('/settings'); }} />)} />
           <Route path="/settings" element={requireAuth(<Settings onBack={() => navigate(lastView || '/agency-dashboard')} />)} />
-          <Route path="/profile" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Profile /></div>)} />
-          <Route path="/organizations" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Organizations onBack={() => navigate('/simulator')} onCreateOrg={() => navigate('/organizations/new')} /></div>)} />
-          <Route path="/organizations/new" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><NewOrganization onBack={() => navigate('/organizations')} /></div>)} />
+          <Route path="/profile" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Profile /></div>)} />
+          <Route path="/organizations" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Organizations onBack={() => navigate('/simulator')} onCreateOrg={() => navigate('/organizations/new')} /></div>)} />
+          <Route path="/organizations/new" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><NewOrganization onBack={() => navigate('/organizations')} /></div>)} />
 
           <Route
             path="/simulator"
             element={
-              <div className="max-w-7xl mx-auto px-6 py-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[calc(100vh-80px)]">
+              <div className="w-full px-6 py-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[calc(100vh-80px)]">
                 <div className="text-center mb-8">
                   <h1 className="text-5xl font-black mb-4 tracking-tight bg-gradient-to-r from-[#69D2E9] to-[#3498DB] bg-clip-text text-transparent">RaawaAI</h1>
                   <p className="text-slate-500 font-medium text-lg uppercase tracking-widest">
@@ -179,11 +179,11 @@ const App = () => {
             }
           />
 
-          <Route path="/reports" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Reports onBack={() => navigate('/simulator')} onDetailedReport={() => navigate('/reports/strategic')} onOptimizeConcept={() => navigate('/reports/optimization')} /></div>)} />
-          <Route path="/reports/strategic" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><StrategicReport onBack={() => navigate('/reports')} /></div>)} />
-          <Route path="/reports/optimization" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><OptimizationReport onBack={() => navigate('/reports')} /></div>)} />
-          <Route path="/upgrade" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Upgrade onBack={() => navigate('/simulator')} /></div>)} />
-          <Route path="/reviewer" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><ReviewerDashboard onBack={() => navigate('/simulator')} /></div>)} />
+          <Route path="/reports" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Reports onBack={() => navigate('/simulator')} onDetailedReport={() => navigate('/reports/strategic')} onOptimizeConcept={() => navigate('/reports/optimization')} /></div>)} />
+          <Route path="/reports/strategic" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><StrategicReport onBack={() => navigate('/reports')} /></div>)} />
+          <Route path="/reports/optimization" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><OptimizationReport onBack={() => navigate('/reports')} /></div>)} />
+          <Route path="/upgrade" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Upgrade onBack={() => navigate('/simulator')} /></div>)} />
+          <Route path="/reviewer" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><ReviewerDashboard onBack={() => navigate('/simulator')} /></div>)} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
