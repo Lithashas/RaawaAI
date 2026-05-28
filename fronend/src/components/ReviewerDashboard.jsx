@@ -2,7 +2,7 @@ import React from 'react';
 
 const ReviewerDashboard = ({ onBack }) => {
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10">
+    <div className="w-full px-6 py-10">
       <div className="space-y-8">
         <div>
           <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Reviewer Dashboard</p>

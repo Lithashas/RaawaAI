@@ -7,7 +7,7 @@ const Footer = () => {
 
   return (
     <footer className="w-full border-t border-white/5 py-12 px-12 md:px-24 mt-20 relative bg-[#050816]">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-12">
         <div className="space-y-4">
           <h3 className="font-bold text-slate-400 uppercase tracking-wider text-xs">RAAWA AI</h3>
           <p className="text-[10px] text-slate-600 leading-relaxed max-w-[240px]">

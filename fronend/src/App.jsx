@@ -157,7 +157,7 @@ const App = () => {
 
           <Route
             path="/"
-            element={<div className="max-w-7xl mx-auto px-6"><Hero onStart={() => navigate('/simulator')} onReview={() => navigate('/reviewer')} /></div>}
+            element={<div className="w-full px-6"><Hero onStart={() => navigate('/simulator')} onReview={() => navigate('/reviewer')} /></div>}
           />
 
           <Route
@@ -198,9 +198,9 @@ const App = () => {
 
           <Route path="/agency-dashboard" element={requireAuth(<AgencyDashboard onNewSimulation={() => navigate('/simulator')} onSettings={() => { setLastView('/agency-dashboard'); navigate('/settings'); }} />)} />
           <Route path="/settings" element={requireAuth(<Settings onBack={() => navigate(lastView || '/agency-dashboard')} />)} />
-          <Route path="/profile" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Profile /></div>)} />
-          <Route path="/organizations" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Organizations onBack={() => navigate('/simulator')} onCreateOrg={() => navigate('/organizations/new')} /></div>)} />
-          <Route path="/organizations/new" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><NewOrganization onBack={() => navigate('/organizations')} /></div>)} />
+          <Route path="/profile" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Profile /></div>)} />
+          <Route path="/organizations" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Organizations onBack={() => navigate('/simulator')} onCreateOrg={() => navigate('/organizations/new')} /></div>)} />
+          <Route path="/organizations/new" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><NewOrganization onBack={() => navigate('/organizations')} /></div>)} />
 
           <Route
             path="/simulator"
@@ -239,11 +239,11 @@ const App = () => {
             }
           />
 
-          <Route path="/reports" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Reports onBack={() => navigate('/simulator')} onDetailedReport={() => navigate('/reports/strategic')} onOptimizeConcept={() => navigate('/reports/optimization')} /></div>)} />
-          <Route path="/reports/strategic" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><StrategicReport onBack={() => navigate('/reports')} /></div>)} />
-          <Route path="/reports/optimization" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><OptimizationReport onBack={() => navigate('/reports')} /></div>)} />
-          <Route path="/upgrade" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Upgrade onBack={() => navigate('/simulator')} /></div>)} />
-          <Route path="/reviewer" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><ReviewerDashboard onBack={() => navigate('/simulator')} /></div>)} />
+          <Route path="/reports" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Reports onBack={() => navigate('/simulator')} onDetailedReport={() => navigate('/reports/strategic')} onOptimizeConcept={() => navigate('/reports/optimization')} /></div>)} />
+          <Route path="/reports/strategic" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><StrategicReport onBack={() => navigate('/reports')} /></div>)} />
+          <Route path="/reports/optimization" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><OptimizationReport onBack={() => navigate('/reports')} /></div>)} />
+          <Route path="/upgrade" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Upgrade onBack={() => navigate('/simulator')} /></div>)} />
+          <Route path="/reviewer" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><ReviewerDashboard onBack={() => navigate('/simulator')} /></div>)} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
