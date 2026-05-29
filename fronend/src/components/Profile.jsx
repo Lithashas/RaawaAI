@@ -347,7 +347,7 @@ const Profile = ({ onSignOut }) => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10 min-h-[calc(100vh-80px)]">
+    <div className="w-full px-6 py-10 min-h-[calc(100vh-80px)]">
       <div className="flex flex-col gap-8">
         <section className="bg-white/5 border border-white/10 rounded-3xl p-8 shadow-xl shadow-slate-950/20 backdrop-blur-xl">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">

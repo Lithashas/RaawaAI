@@ -24,7 +24,7 @@ const NewOrganization = ({ onBack }) => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-10">
+    <div className="w-full px-6 py-10">
       <button
         type="button"
         onClick={onBack}
