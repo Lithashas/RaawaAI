@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, Building2, Briefcase, Edit3, ShieldAlert, Trash2, ArrowRight, ChevronRight } from 'lucide-react';
 import ChangePasswordDialog from './ChangePasswordDialog';
 import ConfirmDialog from './ConfirmDialog';
 
-const Profile = ({ onSignOut }) => {
+const Profile = ({ onSignOut, currentPassword = '', onPasswordChanged }) => {
   const [selectedSection, setSelectedSection] = useState('profile');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -13,6 +13,9 @@ const Profile = ({ onSignOut }) => {
   const [company, setCompany] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [message, setMessage] = useState('');
+  const hasHydratedRef = useRef(false);
+  const lastSavedEmailRef = useRef('');
+  const autoSaveTimerRef = useRef(null);
   const navigate = useNavigate();
 
   const normalizeEmail = (value) => (value || '').trim().toLowerCase();
@@ -30,20 +33,27 @@ const Profile = ({ onSignOut }) => {
     }
   };
 
-  const handleSave = (event) => {
-    event.preventDefault();
-
-    const payload = { name, email, phone, company, jobTitle, description };
-
-    const activeEmail = getCurrentUserEmail();
-    const nextEmail = normalizeEmail(email) || activeEmail;
+  const persistProfile = (sourceEmail, profileData, { showStatus = false } = {}) => {
+    const activeEmail = normalizeEmail(sourceEmail);
+    const nextEmail = normalizeEmail(profileData?.email) || activeEmail;
 
     if (!nextEmail) {
-      setMessage('No active user found. Please sign in again.');
-      return;
+      if (showStatus) {
+        setMessage('No active user found. Please sign in again.');
+      }
+      return false;
     }
 
     try {
+      const payload = {
+        name: profileData?.name || '',
+        email: nextEmail,
+        phone: profileData?.phone || '',
+        company: profileData?.company || '',
+        jobTitle: profileData?.jobTitle || '',
+        description: profileData?.description || '',
+      };
+
       localStorage.setItem(getProfileKey(nextEmail), JSON.stringify(payload));
 
       if (activeEmail && activeEmail !== nextEmail) {
@@ -51,11 +61,26 @@ const Profile = ({ onSignOut }) => {
       }
 
       localStorage.setItem('currentUserEmail', nextEmail);
-      setMessage('Profile saved successfully.');
+      lastSavedEmailRef.current = nextEmail;
+
+      if (showStatus) {
+        setMessage('Profile saved successfully.');
+      }
+
+      return true;
     } catch (e) {
       console.error('Failed to save profile locally', e);
-      setMessage('Failed to save profile.');
+      if (showStatus) {
+        setMessage('Failed to save profile.');
+      }
+      return false;
     }
+  };
+
+  const handleSave = (event) => {
+    event.preventDefault();
+
+    persistProfile(getCurrentUserEmail(), { name, email, phone, company, jobTitle, description }, { showStatus: true });
   };
 
   // Show/perform delete flow via confirmation dialog
@@ -69,6 +94,8 @@ const Profile = ({ onSignOut }) => {
         localStorage.removeItem(getProfileKey(activeEmail));
       }
       localStorage.removeItem('currentUserEmail');
+      hasHydratedRef.current = false;
+      lastSavedEmailRef.current = '';
 
       setName('');
       setEmail('');
@@ -98,40 +125,13 @@ const Profile = ({ onSignOut }) => {
     setShowChangePassword(true);
   };
 
-  const handleChangePasswordSave = (current, newPass, confirmPass) => {
-    if (!current || !newPass || !confirmPass) {
-      setMessage('Please fill all password fields.');
-      return;
-    }
-    if (newPass !== confirmPass) {
-      setMessage('New passwords do not match.');
-      return;
+  const handleChangePasswordSave = async (_current, newPass) => {
+    if (typeof onPasswordChanged === 'function') {
+      onPasswordChanged(newPass);
     }
 
-    // Call backend endpoint to validate `current` and update to `newPass`.
-    (async () => {
-      try {
-        const res = await fetch('/api/profile/password', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ currentPassword: current, newPassword: newPass }),
-        });
-
-        if (!res.ok) {
-          let msg = 'Failed to change password.';
-          try { const j = await res.json(); if (j?.message) msg = j.message; } catch {}
-          setMessage(msg);
-          return;
-        }
-
-        setShowChangePassword(false);
-        setMessage('Password changed successfully.');
-      } catch (err) {
-        console.error('Change password error', err);
-        setMessage('Failed to change password (server unavailable).');
-      }
-    })();
+    setMessage('Password changed successfully.');
+    return { success: true };
   };
 
   useEffect(() => {
@@ -154,7 +154,20 @@ const Profile = ({ onSignOut }) => {
     setCompany(saved?.company || '');
     setJobTitle(saved?.jobTitle || '');
     setDescription(saved?.description || '');
+    lastSavedEmailRef.current = activeEmail;
+    hasHydratedRef.current = true;
   }, []);
+
+  useEffect(() => {
+    if (!hasHydratedRef.current) return undefined;
+
+    clearTimeout(autoSaveTimerRef.current);
+    autoSaveTimerRef.current = setTimeout(() => {
+      persistProfile(getCurrentUserEmail(), { name, email, phone, company, jobTitle, description });
+    }, 300);
+
+    return () => clearTimeout(autoSaveTimerRef.current);
+  }, [name, email, phone, company, jobTitle, description]);
 
   // Clear all data flow via confirmation dialog
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -166,6 +179,8 @@ const Profile = ({ onSignOut }) => {
         localStorage.removeItem(getProfileKey(activeEmail));
       }
       localStorage.removeItem('currentUserEmail');
+      hasHydratedRef.current = false;
+      lastSavedEmailRef.current = '';
 
       setName('');
       setEmail('');
@@ -428,6 +443,7 @@ const Profile = ({ onSignOut }) => {
               )}
                   {showChangePassword && (
                     <ChangePasswordDialog
+                      expectedCurrentPassword={currentPassword}
                       onSave={handleChangePasswordSave}
                       onClose={() => setShowChangePassword(false)}
                     />

@@ -55,25 +55,18 @@ const Organizations = ({ onBack, onCreateOrg }) => {
             <div className="space-y-8 rounded-[2rem] bg-slate-900/80 p-8 shadow-inner shadow-slate-950/20">
               <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                 <div className="space-y-4">
-                  <h2 className="text-3xl font-bold text-white tracking-tight">EXYRA</h2>
-                  <p className="max-w-3xl text-sm leading-7 text-slate-300">
-                    Exyra is a bold, future-forward brand blending tech, creativity, and culture-built for Gen Z to express, connect, and innovate without limits in a fast-moving digital world.
-                  </p>
+                  <h2 className="text-3xl font-bold text-white tracking-tight">No organizations yet</h2>
+                  <p className="max-w-3xl text-sm leading-7 text-slate-300">You don't have any organizations registered under this category. Create a new organization to get started.</p>
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  <span className="rounded-full border border-slate-700 bg-slate-900/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-cyan-300">
-                    GEN-Z
-                  </span>
-                  <span className="rounded-full border border-slate-700 bg-slate-900/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-300">
-                    CORPORATE
-                  </span>
+                  {/* placeholder tags removed */}
                 </div>
               </div>
 
               <div className="flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
-                <span className="font-semibold uppercase tracking-[0.2em] text-slate-200">SIMULATIONS: 3</span>
-                <span className="font-semibold uppercase tracking-[0.2em] text-slate-200">MEMBERS: 10</span>
+                <span className="font-semibold uppercase tracking-[0.2em] text-slate-200">SIMULATIONS: —</span>
+                <span className="font-semibold uppercase tracking-[0.2em] text-slate-200">MEMBERS: —</span>
               </div>
 
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

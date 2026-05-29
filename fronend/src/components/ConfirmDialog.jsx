@@ -8,6 +8,14 @@ const ConfirmDialog = ({ title, description, confirmLabel = 'Confirm', cancelLab
     return () => clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    const scrollTimer = window.setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 0);
+
+    return () => window.clearTimeout(scrollTimer);
+  }, []);
+
   const handleClose = () => {
     setIsVisible(false);
     setTimeout(() => onCancel && onCancel(), 180);

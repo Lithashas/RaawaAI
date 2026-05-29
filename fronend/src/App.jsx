@@ -25,6 +25,8 @@ import Footer from './components/Footer';
 import { runSimulation, refinePolicy, generateReport, saveSimulationId } from './services/geminiService';
 import { ChevronLeft } from 'lucide-react';
 
+const normalizeEmail = (value) => (value || '').trim().toLowerCase();
+
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,6 +46,24 @@ const App = () => {
   const [showSavePassword, setShowSavePassword] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
+
+  const getProfileKey = (email) => `profile:${normalizeEmail(email)}`;
+  const saveProfileForUser = (email, profileData) => {
+    const normalizedEmail = normalizeEmail(email);
+    if (!normalizedEmail) return;
+
+    const nextProfile = {
+      name: profileData?.name || '',
+      email: normalizeEmail(profileData?.email) || normalizedEmail,
+      phone: profileData?.phone || '',
+      company: profileData?.company || '',
+      jobTitle: profileData?.jobTitle || '',
+      description: profileData?.description || '',
+    };
+
+    localStorage.setItem(getProfileKey(normalizedEmail), JSON.stringify(nextProfile));
+    localStorage.setItem('currentUserEmail', normalizedEmail);
+  };
 
   const requireAuth = (element) => {
     if (isAuthenticated) return element;
@@ -127,6 +147,7 @@ const App = () => {
     setResult(null);
     setRefinement(null);
     setReport(null);
+    localStorage.removeItem('currentUserEmail');
     navigate('/');
   };
 
@@ -172,6 +193,7 @@ const App = () => {
                   setUserEmail(email);
                   setUserPassword(password);
                   setIsAuthenticated(true);
+                  localStorage.setItem('currentUserEmail', normalizeEmail(email));
                   const redirectTo = location.state?.from?.pathname || '/agency-dashboard';
                   navigate(redirectTo, { replace: true });
                   setShowSavePassword(true);
@@ -186,10 +208,16 @@ const App = () => {
               <SignUp
                 onBack={() => navigate('/')}
                 onSignIn={() => navigate('/login')}
-                onSignUpSuccess={(email, password) => {
+                onSignUpSuccess={(email, password, profileData) => {
                   setUserEmail(email);
                   setUserPassword(password);
                   setIsAuthenticated(true);
+                  saveProfileForUser(email, {
+                    name: profileData?.name,
+                    email,
+                    company: profileData?.company,
+                    jobTitle: profileData?.jobTitle,
+                  });
                   const redirectTo = location.state?.from?.pathname || '/agency-dashboard';
                   navigate(redirectTo, { replace: true });
                   setShowSavePassword(true);
@@ -202,7 +230,7 @@ const App = () => {
           <Route path="/settings/*" element={requireAuth(<Settings onBack={() => navigate(lastView || '/agency-dashboard')} />)} />
           <Route path="/settings/subs/change-plan" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><ChangePlan onBack={() => navigate('/settings/subs')} /></div>)} />
           <Route path="/settings/subs/payment-methods" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><PaymentMethods onBack={() => navigate('/settings/subs')} /></div>)} />
-          <Route path="/profile" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Profile /></div>)} />
+          <Route path="/profile" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Profile currentPassword={userPassword} onPasswordChanged={setUserPassword} /></div>)} />
           <Route path="/organizations" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Organizations onBack={() => navigate('/simulator')} onCreateOrg={() => navigate('/organizations/new')} /></div>)} />
           <Route path="/organizations/new" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><NewOrganization onBack={() => navigate('/organizations')} /></div>)} />
 
