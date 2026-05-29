@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Plus, Trash2, ChevronRight } from 'lucide-react';
 
-const Dashboard = ({ onNewSimulation, onSettings }) => {
+const Dashboard = ({ onNewSimulation, onSettings, onReports }) => {
   const simulations = [
     {
       id: 1,
@@ -22,6 +23,12 @@ const Dashboard = ({ onNewSimulation, onSettings }) => {
           <p className="text-slate-500 text-sm font-medium">Manage your RaawaAI digital laboratory experiments.</p>
         </div>
         <div className="flex items-center space-x-4">
+          <button 
+            onClick={onReports}
+            className="px-6 py-3.5 bg-white/5 hover:bg-white/10 text-slate-200 rounded-xl text-sm font-bold transition-all border border-white/10"
+          >
+            Reports
+          </button>
           <button 
             onClick={onSettings}
             className="px-6 py-3.5 bg-white/5 hover:bg-white/10 text-slate-200 rounded-xl text-sm font-bold transition-all border border-white/10"

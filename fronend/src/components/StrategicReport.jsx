@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronLeft } from 'lucide-react';
 
 const StrategicReport = ({ onBack }) => {
   return (
@@ -7,9 +8,10 @@ const StrategicReport = ({ onBack }) => {
         <button
           type="button"
           onClick={onBack}
-          className="text-slate-300 hover:text-white text-sm font-semibold"
+          className="flex items-center space-x-2 text-white hover:text-slate-200 transition-colors group"
         >
-          &lt; Back to Dashboard
+          <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-medium">Back to Reports</span>
         </button>
 
         <div className="space-y-2">

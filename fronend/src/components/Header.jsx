@@ -1,59 +1,84 @@
 import React, { useState } from 'react';
-import logo from '../assets/RaawaAI_logo.png';
+import logoImg from '../assets/RaawaAI_logo.png';
 
-const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, onOrganizations, onUpgrade, onProfile, onReviewer, view, userRole = 'Agent', currentPath = '' }) => {
+const Header = ({ 
+  onStart, 
+  onHome, 
+  onSignIn, 
+  onSignOut, 
+  onSettings, 
+  onReports, 
+  onOrganizations, 
+  onUpgrade, 
+  onProfile, 
+  onReviewer, 
+  onAbout, 
+  onDashboard,
+  view, 
+  isAuthenticated = false,
+  userRole = 'Agent', 
+  currentPath = '' 
+}) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const isDashboard = view === 'agency-dashboard';
   const isSettings = view === 'settings';
-  const showDashboardUI = isDashboard || isSettings;
+  const isAbout = view === 'about';
+  const isHome = view === 'home' || view === 'landing';
+  const isSignUp = view === 'signup';
+  const isLogIn = view === 'login';
+  const showDashboardUI = isAuthenticated || isDashboard || isSettings;
+  const showHomeButton = isAbout || isSignUp || isLogIn;
   const isOnSimulator = currentPath === '/simulator';
 
   return (
     <>
     <header className="w-full bg-[#050816] border-b border-white/5 py-4">
       <div className="w-full px-6 flex items-center justify-between">
-        <div className="flex items-center space-x-3 flex-1 min-w-0">
+        <div className="flex items-center flex-1 min-w-0">
           <div 
-            className="flex items-center space-x-3 cursor-pointer group"
+            className="flex items-center cursor-pointer group"
             onClick={onHome}
           >
-            <div className="relative flex items-center justify-center">
-              <img src={logo} alt="RaawaAI logo" className="h-10 md:h-14 w-auto max-w-[180px] object-contain" />
-            </div>
+            <img 
+              src={logoImg} 
+              alt="RaawaAI" 
+              className="h-10 md:h-12 w-auto object-contain" 
+            />
           </div>
-          {showDashboardUI && (
-            <div className="hidden md:flex items-center space-x-2">
-              <button
-                onClick={(e) => { e.stopPropagation(); onStart && onStart(); }}
-                className="px-3 py-2 rounded-full text-sm font-medium bg-white/5 hover:bg-white/10 text-slate-200 flex-shrink-0"
-              >
-                Simulator
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); onReports && onReports(); }}
-                className="px-3 py-2 rounded-full text-sm font-medium bg-white/5 hover:bg-white/10 text-slate-200 flex-shrink-0"
-              >
-                Reports
-              </button>
-              {/* Removed Organizations and Upgrade to simplify header */}
-              <button
-                onClick={(e) => { e.stopPropagation(); onSettings && onSettings(); }}
-                className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
-                  isSettings 
-                    ? 'bg-[#1a4f63] text-white border border-transparent' 
-                    : 'bg-white/5 hover:bg-white/10 text-slate-200'
-                } flex-shrink-0`}
-              >
-                Settings
-              </button>
-            </div>
-          )}
+          {/* Removed desktop quick links to simplify header per user request */}
         </div>
         
         <div className="flex items-center space-x-4 min-w-0 justify-end">
           {showDashboardUI ? (
-            <div className="hidden md:flex items-center space-x-4 shrink-0 relative">
+            <div className="hidden md:flex items-center space-x-6 shrink-0 relative">
+              <button 
+                onClick={onHome}
+                className={`text-sm font-medium transition-colors ${
+                  isHome ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
+                }`}
+              >
+                Home
+              </button>
+              <button 
+                onClick={onDashboard}
+                className={`text-sm font-medium transition-colors ${
+                  isDashboard ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
+                }`}
+              >
+                Agency Dashboard
+              </button>
+              <button 
+                onClick={onAbout}
+                className={`text-sm font-medium transition-colors ${
+                  isAbout ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
+                }`}
+              >
+                About
+              </button>
+              
+              <div className="h-4 w-px bg-white/10 mx-1" />
+
               <div className="flex items-center space-x-2 min-w-0">
                 <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
                 <span className="text-sm font-medium text-slate-300">Role: {userRole}</span>
@@ -62,7 +87,7 @@ const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, o
               <div className="relative">
                 <button
                   onClick={() => setAccountOpen((s) => !s)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-md bg-white/3 hover:bg-white/10 text-slate-200"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md bg-white/5 hover:bg-white/10 text-slate-200"
                 >
                   <span className="text-sm font-semibold">Account</span>
                 </button>
@@ -78,18 +103,30 @@ const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, o
               </div>
             </div>
           ) : (
-            <div className="hidden md:flex items-center space-x-6 shrink-0">
+            <div className="hidden md:flex items-center space-x-8 shrink-0">
+              {showHomeButton && (
+                <button 
+                  onClick={onHome}
+                  className={`text-sm font-medium transition-colors ${
+                    isHome ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
+                  }`}
+                >
+                  Home
+                </button>
+              )}
               <button 
-                onClick={onSignIn}
-                className="text-slate-400 hover:text-white text-sm font-semibold transition"
+                onClick={onAbout}
+                className={`text-sm font-medium transition-colors ${
+                  isAbout ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
+                }`}
               >
-                Sign In
+                About
               </button>
               <button 
-                onClick={onStart}
-                className="bg-[#1a4f63] hover:bg-[#236a85] text-white px-4 py-2 rounded-md text-sm font-bold shadow-lg shadow-blue-900/10 transition-all active:scale-95"
+                onClick={onSignIn}
+                className="text-white hover:text-white/85 text-sm font-medium transition-colors"
               >
-                Get Started
+                Sign In
               </button>
             </div>
           )}
@@ -110,19 +147,28 @@ const Header = ({ onStart, onHome, onSignIn, onSignOut, onSettings, onReports, o
     {mobileOpen && (
       <div className="md:hidden absolute left-0 right-0 top-full bg-[#050816] border-t border-white/5 z-40 animate-in slide-in-from-top-3 duration-200">
         <div className="w-full px-6 py-4 flex flex-col gap-2 transition-all duration-200 ease-out">
-          <button onClick={() => { setMobileOpen(false); onStart && onStart(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Simulator</button>
-          <button onClick={() => { setMobileOpen(false); onReports && onReports(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Reports</button>
-          {/* Organizations and Upgrade removed from mobile menu as well */}
-          <button onClick={() => { setMobileOpen(false); onProfile && onProfile(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Profile</button>
-          <button onClick={() => { setMobileOpen(false); onReviewer && onReviewer(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Reviewer</button>
-          <button onClick={() => { setMobileOpen(false); onSettings && onSettings(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Settings</button>
+           {showDashboardUI ? (
+            <>
+              <button onClick={() => { setMobileOpen(false); onHome && onHome(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isHome ? 'text-[#69D2E9]' : 'text-white'}`}>Home</button>
+              <button onClick={() => { setMobileOpen(false); onDashboard && onDashboard(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isDashboard ? 'text-[#69D2E9]' : 'text-white'}`}>Agency Dashboard</button>
+              <button onClick={() => { setMobileOpen(false); onAbout && onAbout(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isAbout ? 'text-[#69D2E9]' : 'text-white'}`}>About</button>
+              <button onClick={() => { setMobileOpen(false); onProfile && onProfile(); }} className="text-left px-3 py-2 rounded hover:bg-white/5 text-white">Profile</button>
+              <button onClick={() => { setMobileOpen(false); onReviewer && onReviewer(); }} className="text-left px-3 py-2 rounded hover:bg-white/5 text-white">Reviewer</button>
+            </>
+          ) : (
+            <>
+              {showHomeButton && (
+                <button onClick={() => { setMobileOpen(false); onHome && onHome(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isHome ? 'text-[#69D2E9]' : 'text-white'}`}>Home</button>
+              )}
+              <button onClick={() => { setMobileOpen(false); onAbout && onAbout(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isAbout ? 'text-[#69D2E9]' : 'text-white'}`}>About</button>
+            </>
+          )}
           <div className="border-t border-white/5 mt-2 pt-2">
             {showDashboardUI ? (
               <button onClick={() => { setMobileOpen(false); onSignOut && onSignOut(); }} className="text-left px-3 py-2 rounded hover:bg-white/5">Sign Out</button>
             ) : (
               <div className="flex gap-2">
-                <button onClick={() => { setMobileOpen(false); onSignIn && onSignIn(); }} className="px-3 py-2 rounded hover:bg-white/5">Sign In</button>
-                <button onClick={() => { setMobileOpen(false); onStart && onStart(); }} className="px-3 py-2 rounded bg-[#1a4f63] text-white">Get Started</button>
+                <button onClick={() => { setMobileOpen(false); onSignIn && onSignIn(); }} className="px-3 py-2 rounded hover:bg-[#1a4f63] hover:text-white text-slate-300 font-medium w-full text-center py-2 transition-colors border border-white/10">Sign In</button>
               </div>
             )}
           </div>

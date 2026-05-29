@@ -18,9 +18,9 @@ import Upgrade from './components/Upgrade';
 import ReviewerDashboard from './components/ReviewerDashboard';
 import Profile from './components/Profile';
 import Settings from './components/Settings';
+import About from './components/About';
 import ChangePlan from './components/ChangePlan';
 import PaymentMethods from './components/PaymentMethods';
-import SavePasswordDialog from './components/SavePasswordDialog';
 import Footer from './components/Footer';
 import { runSimulation, refinePolicy, generateReport, saveSimulationId } from './services/geminiService';
 import { ChevronLeft } from 'lucide-react';
@@ -130,18 +130,37 @@ const App = () => {
     navigate('/');
   };
 
-  const view = isAuthenticated ? 'agency-dashboard' : 'landing';
+  // Determine standard layout view parameter dynamically based on active route path
+  let view = isAuthenticated ? 'agency-dashboard' : 'landing';
+  if (location.pathname === '/') {
+    view = 'home';
+  } else if (location.pathname === '/about') {
+    view = 'about';
+  } else if (location.pathname === '/settings' || location.pathname.startsWith('/settings/')) {
+    view = 'settings';
+  } else if (location.pathname === '/agency-dashboard') {
+    view = 'agency-dashboard';
+  } else if (location.pathname === '/login') {
+    view = 'login';
+  } else if (location.pathname === '/signup') {
+    view = 'signup';
+  } else if (location.pathname === '/simulator') {
+    view = 'simulator';
+  }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white flex flex-col relative">
+    <div className="min-h-screen bg-[#020617] text-white flex flex-col relative animate-fade-in">
       <Header
         view={view}
+        isAuthenticated={isAuthenticated}
         userRole={userRole}
         currentPath={location.pathname}
         onHome={() => navigate('/')}
+        onDashboard={() => navigate('/agency-dashboard')}
         onStart={() => navigate('/simulator')}
         onSignIn={() => navigate('/login')}
         onSignOut={handleSignOut}
+        onAbout={() => navigate('/about')}
         onSettings={() => {
           setLastView(location.pathname);
           navigate('/settings');
@@ -159,7 +178,12 @@ const App = () => {
 
           <Route
             path="/"
-            element={<div className="w-full px-6"><Hero onStart={() => navigate('/simulator')} onReview={() => navigate('/reviewer')} /></div>}
+            element={<div className="w-full px-6"><Hero onStart={() => navigate(isAuthenticated ? '/simulator' : '/login')} onReview={() => navigate(isAuthenticated ? '/reviewer' : '/login')} /></div>}
+          />
+
+          <Route
+            path="/about"
+            element={<div className="max-w-7xl mx-auto px-6"><About /></div>}
           />
 
           <Route
@@ -198,7 +222,7 @@ const App = () => {
             }
           />
 
-          <Route path="/agency-dashboard" element={requireAuth(<AgencyDashboard onNewSimulation={() => navigate('/simulator')} onSettings={() => { setLastView('/agency-dashboard'); navigate('/settings'); }} />)} />
+          <Route path="/agency-dashboard" element={requireAuth(<AgencyDashboard onNewSimulation={() => navigate('/simulator')} onSettings={() => { setLastView('/agency-dashboard'); navigate('/settings'); }} onReports={() => navigate('/reports')} />)} />
           <Route path="/settings/*" element={requireAuth(<Settings onBack={() => navigate(lastView || '/agency-dashboard')} />)} />
           <Route path="/settings/subs/change-plan" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><ChangePlan onBack={() => navigate('/settings/subs')} /></div>)} />
           <Route path="/settings/subs/payment-methods" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><PaymentMethods onBack={() => navigate('/settings/subs')} /></div>)} />
@@ -208,15 +232,15 @@ const App = () => {
 
           <Route
             path="/simulator"
-            element={
+            element={requireAuth(
               <div className="max-w-7xl mx-auto px-6 py-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-[calc(100vh-80px)]">
                 <button
                   type="button"
                   onClick={() => navigate(isAuthenticated ? '/agency-dashboard' : '/')}
-                  className="flex items-center space-x-2 text-slate-500 hover:text-slate-300 transition-colors group"
+                  className="flex items-center space-x-2 text-white hover:text-slate-200 transition-colors group"
                 >
                   <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                  <span className="text-sm font-medium">Back to Home Page</span>
+                  <span className="text-sm font-medium">Back to Agency Dashboard</span>
                 </button>
 
                 <div className="text-center mb-8">
@@ -240,10 +264,10 @@ const App = () => {
 
                 {refinement && <RefinementPanel refinement={refinement} onClose={() => setRefinement(null)} />}
               </div>
-            }
+            )}
           />
 
-          <Route path="/reports" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Reports onBack={() => navigate('/simulator')} onDetailedReport={() => navigate('/reports/strategic')} onOptimizeConcept={() => navigate('/reports/optimization')} /></div>)} />
+          <Route path="/reports" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Reports onBack={() => navigate('/agency-dashboard')} onDetailedReport={() => navigate('/reports/strategic')} onOptimizeConcept={() => navigate('/reports/optimization')} /></div>)} />
           <Route path="/reports/strategic" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><StrategicReport onBack={() => navigate('/reports')} /></div>)} />
           <Route path="/reports/optimization" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><OptimizationReport onBack={() => navigate('/reports')} /></div>)} />
           <Route path="/upgrade" element={requireAuth(<div className="w-full px-6 py-8 min-h-[calc(100vh-80px)]"><Upgrade onBack={() => navigate('/simulator')} /></div>)} />
@@ -257,16 +281,7 @@ const App = () => {
 
       {report && <ReportViewer report={report} onClose={() => setReport(null)} />}
 
-      {showSavePassword && (
-        <SavePasswordDialog
-          email={userEmail}
-          password={userPassword}
-          onSave={() => setShowSavePassword(false)}
-          onNever={() => setShowSavePassword(false)}
-          onDismiss={() => setShowSavePassword(false)}
-        />
-      )}
-
+      {/* Decorative Background Elements */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-20 overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/5 blur-[150px] rounded-full"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-600/5 blur-[150px] rounded-full"></div>

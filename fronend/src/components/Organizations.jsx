@@ -12,10 +12,10 @@ const Organizations = ({ onBack, onCreateOrg }) => {
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center space-x-2 text-slate-500 hover:text-slate-300 transition-colors group"
+          className="flex items-center space-x-2 text-white hover:text-slate-200 transition-colors group"
         >
           <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">Back to Dashboard</span>
+          <span className="text-sm font-medium">Back to Agency Dashboard</span>
         </button>
 
         <div className="flex items-center justify-between gap-4">

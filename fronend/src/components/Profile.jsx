@@ -197,17 +197,6 @@ const Profile = ({ onSignOut }) => {
 
   const renderSectionContent = () => {
     switch (selectedSection) {
-      case 'about':
-        return (
-          <div className="space-y-6">
-            <div>
-              <p className="text-sm uppercase tracking-[0.3em] text-slate-500 mb-2">About RaawaAI</p>
-              <h2 className="text-3xl font-black text-white">Why RaawaAI?</h2>
-            </div>
-            <p className="text-sm leading-7 text-slate-300">RaawaAI helps teams understand audience sentiment, simulate persona-driven outcomes, and optimize messaging for real-world resonance. Our platform combines behavioral analysis with advanced generative intelligence to turn insights into high-impact decisions.</p>
-            <p className="text-sm leading-7 text-slate-300">Use the dashboard to create simulations, review recommendations, and scale the way your organization connects with customers and stakeholders.</p>
-          </div>
-        );
       case 'terms':
         return (
           <div className="space-y-6">
@@ -380,10 +369,6 @@ const Profile = ({ onSignOut }) => {
               <div className="space-y-4">
                 <button type="button" className={sectionButtonClass('profile')} onClick={() => setSelectedSection('profile')}>
                   <span>Profile Details</span>
-                  <ChevronRight size={18} />
-                </button>
-                <button type="button" className={sectionButtonClass('about')} onClick={() => setSelectedSection('about')}>
-                  <span>About us</span>
                   <ChevronRight size={18} />
                 </button>
                 <button type="button" className={sectionButtonClass('terms')} onClick={() => setSelectedSection('terms')}>
