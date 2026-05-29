@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 try:
@@ -75,7 +75,7 @@ def save_simulation(simulation_id, concept, audience, backlash_score, sample_pos
     if dynamodb_resource is None:
         _fallback_store[simulation_id] = {
             'simulation_id': simulation_id,
-            'created_at': datetime.utcnow().isoformat(),
+            'created_at': datetime.now(timezone.utc).isoformat(),
             'concept': concept,
             'audience': audience,
             'backlash_score': backlash_score,
@@ -89,7 +89,7 @@ def save_simulation(simulation_id, concept, audience, backlash_score, sample_pos
         
         item = {
             'simulation_id': simulation_id,
-            'created_at': datetime.utcnow().isoformat(),
+            'created_at': datetime.now(timezone.utc).isoformat(),
             'concept': concept,
             'audience': audience,
             'backlash_score': Decimal(str(backlash_score)),
@@ -142,7 +142,7 @@ def save_refinement(simulation_id, refinement_data):
     if dynamodb_resource is None:
         _fallback_store[f"{simulation_id}-refinement"] = {
             'simulation_id': f"{simulation_id}-refinement",
-            'created_at': datetime.utcnow().isoformat(),
+            'created_at': datetime.now(timezone.utc).isoformat(),
             'parent_simulation_id': simulation_id,
             'policy': refinement_data.get('policy'),
             'recommendations': refinement_data.get('recommendations'),
@@ -155,7 +155,7 @@ def save_refinement(simulation_id, refinement_data):
         
         item = {
             'simulation_id': f"{simulation_id}-refinement",
-            'created_at': datetime.utcnow().isoformat(),
+            'created_at': datetime.now(timezone.utc).isoformat(),
             'parent_simulation_id': simulation_id,
             'policy': refinement_data.get('policy'),
             'recommendations': refinement_data.get('recommendations'),
@@ -174,7 +174,7 @@ def save_report(simulation_id, report_data):
     if dynamodb_resource is None:
         _fallback_store[f"{simulation_id}-report"] = {
             'simulation_id': f"{simulation_id}-report",
-            'created_at': datetime.utcnow().isoformat(),
+            'created_at': datetime.now(timezone.utc).isoformat(),
             'parent_simulation_id': simulation_id,
             'title': report_data.get('title'),
             'content': report_data.get('content'),
@@ -187,7 +187,7 @@ def save_report(simulation_id, report_data):
         
         item = {
             'simulation_id': f"{simulation_id}-report",
-            'created_at': datetime.utcnow().isoformat(),
+            'created_at': datetime.now(timezone.utc).isoformat(),
             'parent_simulation_id': simulation_id,
             'title': report_data.get('title'),
             'content': report_data.get('content'),

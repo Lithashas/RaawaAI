@@ -39,3 +39,16 @@ The backend will create the table automatically if it does not exist.
 
 - If `boto3` is not installed, the service falls back to an in-memory store.
 - The simulation endpoints save results, refinements, and reports to DynamoDB when the resource is available.
+
+## Docker
+
+To run the backend with a local DynamoDB instance:
+
+1. Copy `backend/.env.example` to `backend/.env` and fill in any needed values.
+2. Start the stack from the repository root:
+
+```bash
+docker compose up --build
+```
+
+The backend will be available on `http://localhost:8000` and DynamoDB Local will be exposed on `http://localhost:8001`.

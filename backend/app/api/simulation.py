@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.models.simulation import SimulationRequest
 from app.models.persona import Persona
@@ -109,7 +109,7 @@ def start_simulation(req: SimulationRequest):
         "summary": summary,
         "sample_posts": reactions,
         "reactions": reactions,
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
 
 
@@ -140,7 +140,7 @@ def generate_report_endpoint(simulation_id: str, report_input: dict):
     audience = report_input.get('audience', 'general')
     report_data = {
         "title": f"Simulation Report: {concept}",
-        "date": datetime.utcnow().strftime('%Y-%m-%d'),
+        "date": datetime.now(timezone.utc).strftime('%Y-%m-%d'),
         "executiveSummary": f"The simulation shows how {audience} may react to the proposed concept.",
         "riskAnalysis": f"Backlash signals are derived from persona reactions in simulation {simulation_id}.",
         "demographicImpact": f"Audience segmentation highlights differing responses across the selected demographic profile.",
