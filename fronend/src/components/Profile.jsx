@@ -1,23 +1,191 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, Building2, Briefcase, Edit3, ShieldAlert, Trash2, ArrowRight, ChevronRight } from 'lucide-react';
+import ChangePasswordDialog from './ChangePasswordDialog';
+import ConfirmDialog from './ConfirmDialog';
 
-const Profile = () => {
+const Profile = ({ onSignOut }) => {
   const [selectedSection, setSelectedSection] = useState('profile');
-  const [name, setName] = useState('K.S.S.Perera');
-  const [email, setEmail] = useState('ksperera23@gmail.com');
-  const [phone, setPhone] = useState('+94771234567');
-  const [description, setDescription] = useState('A visionary leader driving innovation, strategy, and growth.');
-  const [company, setCompany] = useState('EZYRA');
-  const [jobTitle, setJobTitle] = useState('CEO');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [description, setDescription] = useState('');
+  const [company, setCompany] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+
+  const normalizeEmail = (value) => (value || '').trim().toLowerCase();
+  const getProfileKey = (userEmail) => `profile:${normalizeEmail(userEmail)}`;
+  const getCurrentUserEmail = () => normalizeEmail(localStorage.getItem('currentUserEmail'));
+  const loadProfileForEmail = (userEmail) => {
+    const raw = localStorage.getItem(getProfileKey(userEmail));
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw);
+    } catch (err) {
+      console.error('Failed to parse stored profile', err);
+      return null;
+    }
+  };
 
   const handleSave = (event) => {
     event.preventDefault();
-    setMessage('Profile saved successfully.');
+
+    const payload = { name, email, phone, company, jobTitle, description };
+
+    const activeEmail = getCurrentUserEmail();
+    const nextEmail = normalizeEmail(email) || activeEmail;
+
+    if (!nextEmail) {
+      setMessage('No active user found. Please sign in again.');
+      return;
+    }
+
+    try {
+      localStorage.setItem(getProfileKey(nextEmail), JSON.stringify(payload));
+
+      if (activeEmail && activeEmail !== nextEmail) {
+        localStorage.removeItem(getProfileKey(activeEmail));
+      }
+
+      localStorage.setItem('currentUserEmail', nextEmail);
+      setMessage('Profile saved successfully.');
+    } catch (e) {
+      console.error('Failed to save profile locally', e);
+      setMessage('Failed to save profile.');
+    }
   };
 
-  const handleDeleteAccount = () => {
-    setMessage('Account deleted successfully.');
+  // Show/perform delete flow via confirmation dialog
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const performDeleteAccount = () => {
+    const activeEmail = getCurrentUserEmail();
+
+    try {
+      if (activeEmail) {
+        localStorage.removeItem(getProfileKey(activeEmail));
+      }
+      localStorage.removeItem('currentUserEmail');
+
+      setName('');
+      setEmail('');
+      setPhone('');
+      setCompany('');
+      setJobTitle('');
+      setDescription('');
+      setMessage('Account deleted successfully.');
+    } catch (err) {
+      console.error('Failed to delete account locally:', err);
+      setMessage('Failed to delete account.');
+    }
+
+    setShowDeleteConfirm(false);
+
+    if (onSignOut) {
+      onSignOut();
+      return;
+    }
+
+    navigate('/login');
+  };
+
+  const [showChangePassword, setShowChangePassword] = useState(false);
+
+  const handleChangePassword = () => {
+    setShowChangePassword(true);
+  };
+
+  const handleChangePasswordSave = (current, newPass, confirmPass) => {
+    if (!current || !newPass || !confirmPass) {
+      setMessage('Please fill all password fields.');
+      return;
+    }
+    if (newPass !== confirmPass) {
+      setMessage('New passwords do not match.');
+      return;
+    }
+
+    // Call backend endpoint to validate `current` and update to `newPass`.
+    (async () => {
+      try {
+        const res = await fetch('/api/profile/password', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ currentPassword: current, newPassword: newPass }),
+        });
+
+        if (!res.ok) {
+          let msg = 'Failed to change password.';
+          try { const j = await res.json(); if (j?.message) msg = j.message; } catch {}
+          setMessage(msg);
+          return;
+        }
+
+        setShowChangePassword(false);
+        setMessage('Password changed successfully.');
+      } catch (err) {
+        console.error('Change password error', err);
+        setMessage('Failed to change password (server unavailable).');
+      }
+    })();
+  };
+
+  useEffect(() => {
+    const activeEmail = getCurrentUserEmail();
+
+    if (!activeEmail) {
+      setName('');
+      setEmail('');
+      setPhone('');
+      setCompany('');
+      setJobTitle('');
+      setDescription('');
+      return;
+    }
+
+    const saved = loadProfileForEmail(activeEmail);
+    setName(saved?.name || '');
+    setEmail(saved?.email || activeEmail || '');
+    setPhone(saved?.phone || '');
+    setCompany(saved?.company || '');
+    setJobTitle(saved?.jobTitle || '');
+    setDescription(saved?.description || '');
+  }, []);
+
+  // Clear all data flow via confirmation dialog
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  const performClearAllData = () => {
+    try {
+      const activeEmail = getCurrentUserEmail();
+      if (activeEmail) {
+        localStorage.removeItem(getProfileKey(activeEmail));
+      }
+      localStorage.removeItem('currentUserEmail');
+
+      setName('');
+      setEmail('');
+      setPhone('');
+      setCompany('');
+      setJobTitle('');
+      setDescription('');
+      setMessage('All local data cleared.');
+    } catch (err) {
+      console.error('Failed to clear data:', err);
+      setMessage('Failed to clear data.');
+    }
+    setShowClearConfirm(false);
+  };
+
+  const handleClearAllData = () => {
+    const ok = window.confirm('Clear all your profile data? This will remove the current user profile only.');
+    if (!ok) return;
+
+    performClearAllData();
   };
 
   const sectionButtonClass = (section) =>
@@ -243,21 +411,50 @@ const Profile = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <button type="button" className="w-full flex items-center justify-between rounded-2xl border border-rose-400/20 bg-[#1e151a] px-4 py-3 text-sm text-rose-200 hover:bg-[#2d1920] transition">
+                        <button type="button" onClick={handleChangePassword} className="w-full flex items-center justify-between rounded-2xl border border-rose-400/20 bg-[#1e151a] px-4 py-3 text-sm text-rose-200 hover:bg-[#2d1920] transition">
                       <span>Change Password</span>
                       <ChevronRight size={18} />
                     </button>
-                    <button type="button" className="w-full flex items-center justify-between rounded-2xl border border-rose-400/20 bg-[#1e151a] px-4 py-3 text-sm text-rose-200 hover:bg-[#2d1920] transition">
+                        <button type="button" onClick={() => setShowClearConfirm(true)} className="w-full flex items-center justify-between rounded-2xl border border-rose-400/20 bg-[#1e151a] px-4 py-3 text-sm text-rose-200 hover:bg-[#2d1920] transition">
                       <span>Clear All Data</span>
                       <ChevronRight size={18} />
                     </button>
-                    <button type="button" className="w-full flex items-center justify-between rounded-2xl border border-rose-400/20 bg-[#1d1114] px-4 py-3 text-sm font-semibold text-white hover:bg-[#3d121f] transition" onClick={handleDeleteAccount}>
+                        <button type="button" className="w-full flex items-center justify-between rounded-2xl border border-rose-400/20 bg-[#1d1114] px-4 py-3 text-sm font-semibold text-white hover:bg-[#3d121f] transition" onClick={() => setShowDeleteConfirm(true)}>
                       <span>Delete Account</span>
                       <Trash2 size={18} />
                     </button>
                   </div>
                 </div>
               )}
+                  {showChangePassword && (
+                    <ChangePasswordDialog
+                      onSave={handleChangePasswordSave}
+                      onClose={() => setShowChangePassword(false)}
+                    />
+                  )}
+
+                  {showClearConfirm && (
+                    <ConfirmDialog
+                      title="Clear all local data?"
+                      description="This will remove local preferences and cached simulations. This action cannot be undone."
+                      confirmLabel="Clear"
+                      cancelLabel="Cancel"
+                      onConfirm={performClearAllData}
+                      onCancel={() => setShowClearConfirm(false)}
+                    />
+                  )}
+
+                  {showDeleteConfirm && (
+                    <ConfirmDialog
+                      title="Delete account?"
+                      description="Deleting your account will remove all local data. Backend account deletion is not yet implemented in this demo."
+                      confirmLabel="Delete Account"
+                      cancelLabel="Cancel"
+                      danger={true}
+                      onConfirm={performDeleteAccount}
+                      onCancel={() => setShowDeleteConfirm(false)}
+                    />
+                  )}
             </div>
           </div>
         </section>

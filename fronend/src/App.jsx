@@ -122,10 +122,13 @@ const App = () => {
 
   const handleSignOut = () => {
     setIsAuthenticated(false);
+    setUserEmail('');
+    setUserPassword('');
     setResult(null);
     setRefinement(null);
     setReport(null);
-    navigate('/');
+    localStorage.removeItem('currentUserEmail');
+    navigate('/login');
   };
 
   const view = isAuthenticated ? 'agency-dashboard' : 'landing';
@@ -169,6 +172,7 @@ const App = () => {
                 onSignInSuccess={(email, password) => {
                   setUserEmail(email);
                   setUserPassword(password);
+                  localStorage.setItem('currentUserEmail', email);
                   setIsAuthenticated(true);
                   const redirectTo = location.state?.from?.pathname || '/agency-dashboard';
                   navigate(redirectTo, { replace: true });
@@ -184,9 +188,20 @@ const App = () => {
               <SignUp
                 onBack={() => navigate('/')}
                 onSignIn={() => navigate('/login')}
-                onSignUpSuccess={(email, password) => {
+                onSignUpSuccess={(email, password, profileData) => {
                   setUserEmail(email);
                   setUserPassword(password);
+                  localStorage.setItem('currentUserEmail', email);
+                  if (profileData) {
+                    localStorage.setItem(`profile:${email.trim().toLowerCase()}`, JSON.stringify({
+                      name: profileData.name || '',
+                      email,
+                      company: profileData.company || '',
+                      jobTitle: profileData.jobTitle || '',
+                      phone: '',
+                      description: '',
+                    }));
+                  }
                   setIsAuthenticated(true);
                   const redirectTo = location.state?.from?.pathname || '/agency-dashboard';
                   navigate(redirectTo, { replace: true });
@@ -198,7 +213,7 @@ const App = () => {
 
           <Route path="/agency-dashboard" element={requireAuth(<AgencyDashboard onNewSimulation={() => navigate('/simulator')} onSettings={() => { setLastView('/agency-dashboard'); navigate('/settings'); }} />)} />
           <Route path="/settings" element={requireAuth(<Settings onBack={() => navigate(lastView || '/agency-dashboard')} />)} />
-          <Route path="/profile" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Profile /></div>)} />
+          <Route path="/profile" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Profile onSignOut={handleSignOut} /></div>)} />
           <Route path="/organizations" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><Organizations onBack={() => navigate('/simulator')} onCreateOrg={() => navigate('/organizations/new')} /></div>)} />
           <Route path="/organizations/new" element={requireAuth(<div className="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)]"><NewOrganization onBack={() => navigate('/organizations')} /></div>)} />
 

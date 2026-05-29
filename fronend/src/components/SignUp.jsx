@@ -5,8 +5,14 @@ import logo from '../assets/RaawaAI_logo.png';
 const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [company, setCompany] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const scrollToContent = () => {
     window.scrollBy({ top: 300, behavior: 'smooth' });
@@ -14,7 +20,24 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
 
   const handleSignUp = (e) => {
     e.preventDefault();
-    onSignUpSuccess(email, password);
+
+    if (!termsAccepted) {
+      setErrorMessage('You must agree to the terms and conditions before creating an account.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match. Please enter the same password in both fields.');
+      return;
+    }
+
+    setErrorMessage('');
+
+    onSignUpSuccess(email, password, {
+      name: fullName,
+      company,
+      jobTitle,
+    });
   };
 
   return (
@@ -63,7 +86,7 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
             <p className="text-slate-400 text-xs text-center">Submit simulations and get insights on public sentiment</p>
           </div>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleSignUp}>
             <div className="space-y-4">
               <div className="group">
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Full Name</label>
@@ -72,6 +95,8 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
                   <input 
                     type="text" 
                     placeholder="Enter your full name" 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                     className="w-full bg-[#0a0f1d] border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#69D2E9]/50 focus:border-[#69D2E9]/50 transition-all placeholder:text-slate-700"
                   />
                 </div>
@@ -99,6 +124,8 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
                     <input 
                       type="text" 
                       placeholder="Your company or institution" 
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
                       className="w-full bg-[#0a0f1d] border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#69D2E9]/50 focus:border-[#69D2E9]/50 transition-all placeholder:text-slate-700"
                     />
                   </div>
@@ -111,6 +138,8 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
                     <input 
                       type="text" 
                       placeholder="e.g., Product Manager" 
+                      value={jobTitle}
+                      onChange={(e) => setJobTitle(e.target.value)}
                       className="w-full bg-[#0a0f1d] border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#69D2E9]/50 focus:border-[#69D2E9]/50 transition-all placeholder:text-slate-700"
                     />
                   </div>
@@ -145,6 +174,8 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
                   <input 
                     type={showConfirmPassword ? 'text' : 'password'} 
                     placeholder="Confirm your password" 
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full bg-[#0a0f1d] border border-white/10 rounded-xl py-3.5 pl-12 pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-[#69D2E9]/50 focus:border-[#69D2E9]/50 transition-all placeholder:text-slate-700"
                   />
                   <button 
@@ -158,17 +189,34 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
               </div>
             </div>
 
+            {errorMessage && (
+              <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                {errorMessage}
+              </div>
+            )}
+
             <div className="flex items-center space-x-3 mb-6">
-              <input type="checkbox" className="w-4 h-4 rounded border-white/10 bg-[#0a0f1d] text-[#69D2E9] focus:ring-offset-0 focus:ring-0" />
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={(e) => {
+                  setTermsAccepted(e.target.checked);
+                  if (e.target.checked && errorMessage.includes('terms and conditions')) {
+                    setErrorMessage('');
+                  }
+                }}
+                className="w-4 h-4 rounded border-white/10 bg-[#0a0f1d] text-[#69D2E9] focus:ring-offset-0 focus:ring-0"
+              />
               <p className="text-[11px] text-slate-400">
                 I agree to the <span className="text-[#69D2E9] cursor-pointer hover:underline">Terms of Service</span> and <span className="text-[#69D2E9] cursor-pointer hover:underline">Privacy Policy</span>
               </p>
             </div>
 
             <button 
-              type="button"
+              type="submit"
+              disabled={!termsAccepted}
               onClick={handleSignUp}
-              className="w-full bg-gradient-to-r from-[#1061CC] to-[#49C5E0] hover:scale-[1.01] active:scale-[0.99] text-white font-bold py-4 rounded-xl shadow-lg transition-all"
+              className="w-full bg-gradient-to-r from-[#1061CC] to-[#49C5E0] hover:scale-[1.01] active:scale-[0.99] text-white font-bold py-4 rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               Create Account
             </button>
