@@ -1,26 +1,33 @@
 import React, { useState } from 'react';
+import { createOrganization } from '../services/accountService';
 
 const NewOrganization = ({ onBack }) => {
   const [name, setName] = useState('');
   const [sector, setSector] = useState('Government');
   const [community, setCommunity] = useState('Global Gen-Z');
   const [description, setDescription] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const orgData = {
-      name,
-      sector,
-      community,
-      description,
-    };
-    console.log('New organization submitted:', orgData);
-    // TODO: send orgData to backend or state management
-    alert('Organization added successfully!');
-    setName('');
-    setSector('Government');
-    setCommunity('Global Gen-Z');
-    setDescription('');
+    setErrorMessage('');
+    setIsSaving(true);
+
+    try {
+      await createOrganization({ name, sector, community, description });
+      alert('Organization added successfully!');
+      setName('');
+      setSector('Government');
+      setCommunity('Global Gen-Z');
+      setDescription('');
+      if (onBack) onBack();
+    } catch (err) {
+      console.error(err);
+      setErrorMessage(err.message || 'Failed to save organization.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -36,6 +43,7 @@ const NewOrganization = ({ onBack }) => {
         <h1 className="text-3xl font-bold text-white mb-3">New Organization</h1>
         <p className="text-slate-400 mb-8">Register your new organization.</p>
 
+        {errorMessage && <div className="mb-4 text-rose-400">{errorMessage}</div>}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">Organization Name <span className="text-red-400">*</span></label>
@@ -91,9 +99,10 @@ const NewOrganization = ({ onBack }) => {
 
           <button
             type="submit"
-            className="w-full rounded-2xl bg-cyan-500 px-6 py-3 text-sm font-bold text-slate-950 hover:bg-cyan-400 transition"
+            disabled={isSaving}
+            className="w-full rounded-2xl bg-cyan-500 px-6 py-3 text-sm font-bold text-slate-950 hover:bg-cyan-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Add New Organization
+            {isSaving ? 'Saving...' : 'Add New Organization'}
           </button>
         </form>
       </div>

@@ -10,16 +10,14 @@ const Subscriptions = () => {
       <p className="text-slate-400 mb-6">Manage your billing plan and subscription preferences.</p>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-[#07101d] p-6">
-          <p className="text-sm text-slate-300">Current Plan</p>
-          <h3 className="text-xl font-bold text-white">Pro — Team</h3>
-          <p className="text-sm text-slate-500">Seats: 12 • Next billing: 2026-06-01</p>
+        <div className="rounded-2xl border border-white/10 bg-[#07101d] p-6 text-center text-slate-300">
+          <p className="text-sm">No active subscription</p>
+          <h3 className="text-xl font-bold text-white">—</h3>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-[#07101d] p-6">
-          <p className="text-sm text-slate-300">Payment Method</p>
-          <h3 className="text-lg font-semibold text-white">Visa •••• 4242</h3>
-          <p className="text-sm text-slate-500">Expires: 06/27</p>
+        <div className="rounded-2xl border border-white/10 bg-[#07101d] p-6 text-center text-slate-300">
+          <p className="text-sm">Payment Method</p>
+          <h3 className="text-lg font-semibold text-white">—</h3>
         </div>
       </div>
 

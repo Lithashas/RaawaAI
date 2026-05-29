@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
-const ChangePasswordDialog = ({ onSave, onClose }) => {
+const ChangePasswordDialog = ({ expectedCurrentPassword = '', onSave, onClose }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -9,10 +9,20 @@ const ChangePasswordDialog = ({ onSave, onClose }) => {
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    const scrollTimer = window.setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 0);
+
+    return () => window.clearTimeout(scrollTimer);
   }, []);
 
   const handleClose = () => {
@@ -20,8 +30,45 @@ const ChangePasswordDialog = ({ onSave, onClose }) => {
     setTimeout(() => onClose && onClose(), 240);
   };
 
-  const handleSave = () => {
-    onSave && onSave(currentPassword, newPassword, confirmPassword);
+  const handleSave = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setErrorMessage('Please fill all password fields.');
+      return;
+    }
+
+    if (currentPassword !== expectedCurrentPassword) {
+      setErrorMessage('Current password does not match');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setErrorMessage('New passwords do not match.');
+      return;
+    }
+
+    setErrorMessage('');
+    setIsSaving(true);
+
+    try {
+      const result = await onSave?.(currentPassword, newPassword, confirmPassword);
+
+      if (result?.success === false) {
+        setErrorMessage(result.message || 'Failed to change password.');
+        return;
+      }
+
+      if (result?.message && !result?.success) {
+        setErrorMessage(result.message);
+        return;
+      }
+
+      handleClose();
+    } catch (error) {
+      console.error('Change password failed', error);
+      setErrorMessage(error?.message || 'Failed to change password.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -35,6 +82,12 @@ const ChangePasswordDialog = ({ onSave, onClose }) => {
         </div>
 
         <div className="p-6 space-y-4">
+          {errorMessage && (
+            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">
+              {errorMessage}
+            </div>
+          )}
+
           <div>
             <label className="text-xs text-slate-400 uppercase">Current Password</label>
             <div className="mt-2 flex items-center bg-[#06101a] border border-white/5 rounded px-3 py-2">
@@ -79,7 +132,9 @@ const ChangePasswordDialog = ({ onSave, onClose }) => {
 
           <div className="flex items-center justify-end space-x-3 pt-2">
             <button onClick={handleClose} className="px-4 py-2 rounded bg-white/5 hover:bg-white/10 text-sm">Cancel</button>
-            <button onClick={handleSave} className="px-4 py-2 rounded bg-[#1a4f63] hover:bg-[#236a85] text-white text-sm font-semibold">Save</button>
+            <button onClick={handleSave} disabled={isSaving} className="px-4 py-2 rounded bg-[#1a4f63] hover:bg-[#236a85] disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold">
+              {isSaving ? 'Saving...' : 'Save'}
+            </button>
           </div>
         </div>
       </div>

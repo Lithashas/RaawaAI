@@ -31,13 +31,13 @@ const ReviewerDashboard = ({ onBack }) => {
                   <span className="inline-flex rounded-full bg-slate-700/80 px-4 py-2 text-xs uppercase tracking-[0.3em] text-slate-300">
                     Pending
                   </span>
-                  <h2 className="text-2xl font-bold text-white">Aura Luxury : "The EverGreen watch"</h2>
-                  <p className="text-slate-400 max-w-3xl">A campaign for a 24K gold watch claiming to be “100% climate positive” through carbon credits, despite the product’s luxury positioning and mixed public trust.</p>
+                  <h2 className="text-2xl font-bold text-white">No simulations available</h2>
+                  <p className="text-slate-400 max-w-3xl">There are currently no simulations pending review. Create or import simulations to see them here.</p>
                 </div>
 
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                   <div className="rounded-3xl border border-white/10 bg-slate-950/80 px-6 py-5 text-center">
-                    <span className="block text-5xl font-black text-emerald-400">72%</span>
+                    <span className="block text-5xl font-black text-emerald-400">—</span>
                     <span className="text-xs uppercase tracking-[0.3em] text-slate-500">Friction Index</span>
                   </div>
                   <button type="button" className="rounded-full bg-cyan-500 px-6 py-3 text-sm font-bold text-slate-950 hover:bg-cyan-400 transition">
