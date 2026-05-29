@@ -5,14 +5,19 @@ const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const scrollToContent = () => {
-    window.scrollBy({ top: 300, behavior: 'smooth' });
-  };
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSignIn = (e) => {
     e.preventDefault();
-    onSignInSuccess(email, password);
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    
+    // Defer the sign-in success callback by 600ms. This prevents the immediate,
+    // synchronous unmounting of the form elements, giving Google Password Manager/browser
+    // heuristics the required time to capture the submitted credentials and prompt the user.
+    setTimeout(() => {
+      onSignInSuccess(email, password);
+    }, 600);
   };
 
   return (
@@ -26,26 +31,7 @@ const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
           <X size={32} />
         </button>
 
-        <button
-          onClick={scrollToContent}
-          className="fixed bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center text-slate-500 hover:text-[#49C5E0] transition-colors group z-20 animate-bounce"
-        >
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2 opacity-50 group-hover:opacity-100 transition-opacity">
-            Scroll for form
-          </span>
-          <ChevronDown size={24} />
-        </button>
-
         <div className="w-full max-w-[480px] flex flex-col items-center mt-8">
-          <button
-            type="button"
-            onClick={onBack}
-            className="self-start flex items-center space-x-2 text-slate-500 hover:text-slate-300 transition-colors group mb-6"
-          >
-            <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-medium">Back to Home Page</span>
-          </button>
-
           <h1 className="text-3xl font-medium mb-2 tracking-tight">Welcome Back</h1>
           <p className="text-blue-500 text-sm mb-10 font-medium">Sign in to your account to continue</p>
 
@@ -58,6 +44,8 @@ const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
                 </span>
                 <input
                   type="email"
+                  name="email"
+                  autoComplete="username"
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -74,6 +62,8 @@ const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
                 </span>
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  autoComplete="current-password"
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -98,9 +88,12 @@ const Login = ({ onBack, onSignUp, onSignInSuccess }) => {
 
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-[#1061CC] to-[#49C5E0] hover:scale-[1.01] active:scale-[0.99] text-white font-bold py-3.5 rounded-lg shadow-lg transition-all"
+              disabled={isSubmitting}
+              className={`w-full bg-gradient-to-r from-[#1061CC] to-[#49C5E0] text-white font-bold py-3.5 rounded-lg shadow-lg transition-all ${
+                isSubmitting ? 'opacity-70 cursor-not-allowed scale-[0.99]' : 'hover:scale-[1.01] active:scale-[0.99]'
+              }`}
             >
-              Sign In
+              {isSubmitting ? 'Signing in...' : 'Sign In'}
             </button>
 
             <div className="text-center text-sm pt-1">
