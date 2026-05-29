@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Building2, Briefcase, Lock, Eye, EyeOff, X, ShieldCheck, ChevronDown } from 'lucide-react';
-import logo from '../assets/RaawaAI_logo.png';
+import { User, Mail, Building2, Briefcase, Lock, Eye, EyeOff, X, ShieldCheck, ChevronDown, ChevronLeft } from 'lucide-react';
 
 const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +12,7 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const scrollToContent = () => {
     window.scrollBy({ top: 300, behavior: 'smooth' });
@@ -38,19 +38,19 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
       company,
       jobTitle,
     });
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    // Defer the sign-up success callback by 600ms. This prevents the immediate,
+    // synchronous unmounting of the form elements, giving Google Password Manager/browser
+    // heuristics the required time to capture the submitted credentials and prompt the user.
+    setTimeout(() => {
+      onSignUpSuccess(email, password);
+    }, 600);
   };
 
   return (
     <div className="w-full text-slate-100 flex flex-col font-sans">
-      {/* Header */}
-      <header className="w-full border-b border-white/5 py-6 px-12 flex justify-between items-center bg-[#050816]">
-        <div className="flex items-center space-x-3 cursor-pointer group" onClick={onBack}>
-          <div className="relative flex items-center justify-center">
-            <img src={logo} alt="RaawaAI logo" className="h-12 md:h-14 w-auto max-w-[180px] object-contain" />
-          </div>
-        </div>
-      </header>
-
       {/* Main content */}
       <main className="flex-grow flex flex-col items-center relative px-6 pt-12 pb-32">
         {/* Close Button */}
@@ -94,6 +94,8 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#69D2E9] transition-colors" size={18} />
                   <input 
                     type="text" 
+                    name="name"
+                    autoComplete="name"
                     placeholder="Enter your full name" 
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -108,6 +110,8 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#69D2E9] transition-colors" size={18} />
                   <input 
                     type="email" 
+                    name="email"
+                    autoComplete="username"
                     placeholder="you@example.com" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -152,6 +156,8 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#69D2E9] transition-colors" size={18} />
                   <input 
                     type={showPassword ? 'text' : 'password'} 
+                    name="password"
+                    autoComplete="new-password"
                     placeholder="Create a strong password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -173,6 +179,8 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#69D2E9] transition-colors" size={18} />
                   <input 
                     type={showConfirmPassword ? 'text' : 'password'} 
+                    name="confirm-password"
+                    autoComplete="new-password"
                     placeholder="Confirm your password" 
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -217,8 +225,12 @@ const SignUp = ({ onBack, onSignIn, onSignUpSuccess }) => {
               disabled={!termsAccepted}
               onClick={handleSignUp}
               className="w-full bg-gradient-to-r from-[#1061CC] to-[#49C5E0] hover:scale-[1.01] active:scale-[0.99] text-white font-bold py-4 rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              disabled={isSubmitting}
+              className={`w-full bg-gradient-to-r from-[#1061CC] to-[#49C5E0] text-white font-bold py-4 rounded-xl shadow-lg transition-all ${
+                isSubmitting ? 'opacity-70 cursor-not-allowed scale-[0.99]' : 'hover:scale-[1.01] active:scale-[0.99]'
+              }`}
             >
-              Create Account
+              {isSubmitting ? 'Creating Account...' : 'Create Account'}
             </button>
 
             <div className="text-center mt-6">
