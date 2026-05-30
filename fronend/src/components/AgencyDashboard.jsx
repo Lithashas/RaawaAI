@@ -2,7 +2,7 @@
 import React from 'react';
 import { Plus, Trash2, ChevronRight } from 'lucide-react';
 
-const Dashboard = ({ onNewSimulation, onSettings }) => {
+const Dashboard = ({ onNewSimulation, onSettings, onReports }) => {
   const simulations = [];
 
   return (
