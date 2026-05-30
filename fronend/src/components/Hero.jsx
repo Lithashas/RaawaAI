@@ -24,9 +24,17 @@ const featureCards = [
   },
 ];
 
-const Hero = ({ onStart }) => {
+const Hero = ({ onStart, onReview }) => {
   const scrollToFooter = () => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
+  const handleReview = () => {
+    if (onReview) {
+      onReview();
+      return;
+    }
+    scrollToFooter();
   };
 
   return (
@@ -67,7 +75,7 @@ const Hero = ({ onStart }) => {
           </button>
           
           <button 
-            onClick={scrollToFooter}
+            onClick={handleReview}
             className="flex items-center space-x-3 px-8 py-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-100 text-lg font-bold transition-all backdrop-blur-md"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
