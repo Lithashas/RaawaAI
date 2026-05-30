@@ -33,23 +33,22 @@ const Header = ({
 
   return (
     <>
-    <header className="w-full bg-[#050816] border-b border-white/5 py-4">
+    <header className="sticky top-0 z-50 w-full shrink-0 border-b border-white/5 bg-[#050816] py-4">
       <div className="w-full px-6 flex items-center justify-between">
-        <div className="flex items-center flex-1 min-w-0">
+        <div className="flex items-center shrink-0">
           <div 
             className="flex items-center cursor-pointer group"
             onClick={onHome}
           >
-            <img 
-              src={logoImg} 
-              alt="RaawaAI" 
-              className="h-10 md:h-12 w-auto object-contain" 
+            <img
+              src={logoImg}
+              alt="RaawaAI"
+              className="h-10 w-auto object-contain md:h-12"
             />
           </div>
-          {/* Removed desktop quick links to simplify header per user request */}
         </div>
         
-        <div className="flex items-center space-x-4 min-w-0 justify-end">
+        <div className="flex items-center space-x-4 justify-end shrink-0">
           {showDashboardUI ? (
             <div className="hidden md:flex items-center space-x-6 shrink-0 relative">
               <button 
@@ -104,16 +103,14 @@ const Header = ({
             </div>
           ) : (
             <div className="hidden md:flex items-center space-x-8 shrink-0">
-              {showHomeButton && (
-                <button 
-                  onClick={onHome}
-                  className={`text-sm font-medium transition-colors ${
-                    isHome ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
-                  }`}
-                >
-                  Home
-                </button>
-              )}
+              <button 
+                onClick={onHome}
+                className={`text-sm font-medium transition-colors ${
+                  isHome ? 'text-[#69D2E9]' : 'text-white hover:text-white/85'
+                }`}
+              >
+                Home
+              </button>
               <button 
                 onClick={onAbout}
                 className={`text-sm font-medium transition-colors ${
@@ -157,9 +154,7 @@ const Header = ({
             </>
           ) : (
             <>
-              {showHomeButton && (
-                <button onClick={() => { setMobileOpen(false); onHome && onHome(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isHome ? 'text-[#69D2E9]' : 'text-white'}`}>Home</button>
-              )}
+              <button onClick={() => { setMobileOpen(false); onHome && onHome(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isHome ? 'text-[#69D2E9]' : 'text-white'}`}>Home</button>
               <button onClick={() => { setMobileOpen(false); onAbout && onAbout(); }} className={`text-left px-3 py-2 rounded hover:bg-white/5 transition-colors ${isAbout ? 'text-[#69D2E9]' : 'text-white'}`}>About</button>
             </>
           )}

@@ -167,6 +167,16 @@ const App = () => {
     view = 'signup';
   } else if (location.pathname === '/simulator') {
     view = 'simulator';
+  } else if (location.pathname === '/reports' || location.pathname.startsWith('/reports/')) {
+    view = 'reports';
+  } else if (location.pathname === '/profile') {
+    view = 'profile';
+  } else if (location.pathname === '/reviewer') {
+    view = 'reviewer';
+  } else if (location.pathname === '/upgrade') {
+    view = 'upgrade';
+  } else if (location.pathname === '/organizations' || location.pathname.startsWith('/organizations/')) {
+    view = 'organizations';
   }
 
   return (
